@@ -2,6 +2,8 @@
 #include <iostream>
 #include <SDL_image.h>
 
+#include "Level.h"
+
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 
@@ -9,6 +11,7 @@ const int RENDER_WIDTH = 320;
 const int RENDER_HEIGHT = 180;
 
 int main(int argc, char *argv[]) {
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0){
         std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
         return 1;
@@ -48,17 +51,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    SDL_Texture *marioTexture = IMG_LoadTexture(renderer, "assets/mario.png");
-    if (!marioTexture) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-        return 1;
-    }
-
-    SDL_Rect marioDestination;
-    SDL_QueryTexture(marioTexture, NULL, NULL, &marioDestination.w, &marioDestination.h);
-    marioDestination.x = (RENDER_WIDTH - marioDestination.w) / 2;
-    marioDestination.y = (RENDER_HEIGHT - marioDestination.h) / 2;
-
     SDL_Texture *renderTexture = SDL_CreateTexture(
         renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, RENDER_WIDTH, RENDER_HEIGHT
     );
@@ -66,6 +58,8 @@ int main(int argc, char *argv[]) {
         std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << std::endl;
         return 1;
     }
+
+    Level *level = new Level(renderer, "assets/test-level-tiles.png");
 
     SDL_Event event;
     bool shouldQuit = false;
@@ -77,9 +71,7 @@ int main(int argc, char *argv[]) {
         }
 
         SDL_SetRenderTarget(renderer, renderTexture);
-        SDL_SetRenderDrawColor(renderer, 128, 0, 255, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, marioTexture, NULL, &marioDestination);
+        level->render(renderer);
 
         SDL_SetRenderTarget(renderer, NULL);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -88,7 +80,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
 
-    SDL_DestroyTexture(marioTexture);
+    delete level;
+
     SDL_DestroyTexture(renderTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

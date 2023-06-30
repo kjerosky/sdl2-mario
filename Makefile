@@ -1,7 +1,8 @@
 EXECUTABLE = mario
 
 CPP_FILES = \
-	main.cpp
+	main.cpp \
+	Level.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \
