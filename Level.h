@@ -11,7 +11,7 @@ public:
     Level(SDL_Renderer *renderer, const char *levelTilesFilename);
     ~Level();
 
-    void render(SDL_Renderer *renderer);
+    void render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
 
 private:
 

@@ -60,6 +60,9 @@ int main(int argc, char *argv[]) {
     }
 
     Level *level = new Level(renderer, "assets/test-level-tiles.png");
+    SDL_Point worldCameraPosition = {0, 0};
+
+    const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 
     SDL_Event event;
     bool shouldQuit = false;
@@ -70,8 +73,11 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        worldCameraPosition.x += keyboardState[SDL_SCANCODE_D] - keyboardState[SDL_SCANCODE_A];
+        worldCameraPosition.y += keyboardState[SDL_SCANCODE_S] - keyboardState[SDL_SCANCODE_W];
+
         SDL_SetRenderTarget(renderer, renderTexture);
-        level->render(renderer);
+        level->render(renderer, &worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, NULL);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
