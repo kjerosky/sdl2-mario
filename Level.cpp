@@ -6,6 +6,8 @@
 
 Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
     static int staticTileData[] = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -42,8 +44,8 @@ Level::~Level() {
 void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
     int leftMostTileX = std::max(worldCameraPosition->x / 16, 0);
     int rightMostTileX = std::min(leftMostTileX + 19 + 1, 39);
-    int topMostTileY = std::max(0, 0); //TODO VERTICAL CAMERA MOVEMENT
-    int bottomMostTileY = std::min(topMostTileY + 11 + 1, 11); //TODO VERTICAL CAMERA MOVEMENT
+    int topMostTileY = std::max(worldCameraPosition->y / 16, 0);
+    int bottomMostTileY = std::min(topMostTileY + 11 + 1, 13);
 
     SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
     SDL_RenderClear(renderer);
