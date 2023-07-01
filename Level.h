@@ -15,10 +15,15 @@ public:
 
 private:
 
-    SDL_Texture *levelTiles;
     int *tileData;
-    SDL_Color backgroundColor;
+    int tileDataCount;
+    int horizontalTileCount;
+    int verticalTileCount;
 
+    SDL_Texture *levelTiles;
+    int tileHorizontalPixels;
+    int tileVerticalPixels;
+    SDL_Color backgroundColor;
 };
 
 #endif

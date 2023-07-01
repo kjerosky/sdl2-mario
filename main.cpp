@@ -2,15 +2,16 @@
 #include <iostream>
 #include <SDL_image.h>
 
+#include "GameConfig.h"
 #include "Level.h"
 
-const int WINDOW_WIDTH = 1280;
-const int WINDOW_HEIGHT = 720;
-
-const int RENDER_WIDTH = 320;
-const int RENDER_HEIGHT = 180;
-
 int main(int argc, char *argv[]) {
+
+    GameConfig *gameConfig = GameConfig::getInstance();
+    int windowWidth = gameConfig->getWindowWidth();
+    int windowHeight = gameConfig->getWindowHeight();
+    int renderWidth = gameConfig->getRenderWidth();
+    int renderHeight = gameConfig->getRenderHeight();
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0){
         std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -21,8 +22,8 @@ int main(int argc, char *argv[]) {
         "Mario!",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT,
+        windowWidth,
+        windowHeight,
         SDL_WINDOW_SHOWN
     );
     if (window == NULL){
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]) {
     }
 
     SDL_Texture *renderTexture = SDL_CreateTexture(
-        renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, RENDER_WIDTH, RENDER_HEIGHT
+        renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, renderWidth, renderHeight
     );
     if (!renderTexture) {
         std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << std::endl;

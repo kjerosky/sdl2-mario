@@ -3,6 +3,9 @@
 #include <SDL_image.h>
 #include <iostream>
 #include <algorithm>
+#include <cmath>
+
+#include "GameConfig.h"
 
 Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
     static int staticTileData[] = {
@@ -21,14 +24,20 @@ Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     };
-    int dataCount = sizeof(staticTileData) / sizeof(int);
-    tileData = new int[dataCount];
+    tileDataCount = sizeof(staticTileData) / sizeof(int);
+    tileData = new int[tileDataCount];
     memcpy(tileData, staticTileData, sizeof(staticTileData));
+
+    horizontalTileCount = 40;
+    verticalTileCount = 14;
 
     levelTiles = IMG_LoadTexture(renderer, levelTilesFilename);
     if (!levelTiles) {
         std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
     }
+
+    tileHorizontalPixels = 16;
+    tileVerticalPixels = 16;
 
     backgroundColor.r = 49;
     backgroundColor.g = 171;
@@ -42,20 +51,38 @@ Level::~Level() {
 }
 
 void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
-    int leftMostTileX = std::max(worldCameraPosition->x / 16, 0);
-    int rightMostTileX = std::min(leftMostTileX + 19 + 1, 39);
-    int topMostTileY = std::max(worldCameraPosition->y / 16, 0);
-    int bottomMostTileY = std::min(topMostTileY + 11 + 1, 13);
+    GameConfig *gameConfig = GameConfig::getInstance();
+    int renderWidth = gameConfig->getRenderWidth();
+    int renderHeight = gameConfig->getRenderHeight();
+
+    int visibleHorizontalTiles = ceil(renderWidth / (float)tileHorizontalPixels);
+    int visibleVerticalTiles = ceil(renderHeight / (float)tileVerticalPixels);
+
+    int leftMostTileX = std::max(worldCameraPosition->x / tileHorizontalPixels, 0);
+    int rightMostTileX = std::min(leftMostTileX + visibleHorizontalTiles, horizontalTileCount - 1);
+    int topMostTileY = std::max(worldCameraPosition->y / tileVerticalPixels, 0);
+    int bottomMostTileY = std::min(topMostTileY + visibleVerticalTiles, verticalTileCount - 1);
 
     SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
     SDL_RenderClear(renderer);
 
-    SDL_Rect sourceRect = {0, 0, 16, 16};
+    SDL_Rect sourceRect = {0, 0, tileHorizontalPixels, tileVerticalPixels};
     for (int y = topMostTileY; y <= bottomMostTileY; y++) {
         for (int x = leftMostTileX; x <= rightMostTileX; x++) {
-            sourceRect.x = tileData[y * 40 + x] * 16;
+            int tileDataIndex = y * horizontalTileCount + x;
+            if (tileDataIndex >= tileDataCount) {
+                continue;
+            }
 
-            SDL_Rect destinationRect = {x * 16 - worldCameraPosition->x, y * 16 - worldCameraPosition->y, 16, 16};
+            sourceRect.x = tileData[tileDataIndex] * tileHorizontalPixels;
+
+            SDL_Rect destinationRect = {
+                x * tileHorizontalPixels - worldCameraPosition->x,
+                y * tileVerticalPixels - worldCameraPosition->y,
+                tileHorizontalPixels,
+                tileVerticalPixels
+            };
+
             SDL_RenderCopy(renderer, levelTiles, &sourceRect, &destinationRect);
         }
     }
