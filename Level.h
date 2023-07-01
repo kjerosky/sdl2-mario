@@ -2,7 +2,6 @@
 #define LEVEL_H
 
 #include <SDL.h>
-#include <stdint.h>
 
 class Level {
 
@@ -12,6 +11,7 @@ public:
     ~Level();
 
     void render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
+    void constrainCameraToLevel(SDL_Point *cameraPosition);
 
 private:
 

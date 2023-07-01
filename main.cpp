@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
 
         worldCameraPosition.x += keyboardState[SDL_SCANCODE_D] - keyboardState[SDL_SCANCODE_A];
         worldCameraPosition.y += keyboardState[SDL_SCANCODE_S] - keyboardState[SDL_SCANCODE_W];
+        level->constrainCameraToLevel(&worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, renderTexture);
         level->render(renderer, &worldCameraPosition);

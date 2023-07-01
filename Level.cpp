@@ -87,3 +87,15 @@ void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
         }
     }
 }
+
+void Level::constrainCameraToLevel(SDL_Point *cameraPosition) {
+    GameConfig *gameConfig = GameConfig::getInstance();
+    int renderWidth = gameConfig->getRenderWidth();
+    int renderHeight = gameConfig->getRenderHeight();
+
+    int maxAllowedCameraX = horizontalTileCount * tileHorizontalPixels - renderWidth;
+    int maxAllowedCameraY = verticalTileCount * tileVerticalPixels - renderHeight;
+
+    cameraPosition->x = SDL_clamp(cameraPosition->x, 0, maxAllowedCameraX);
+    cameraPosition->y = SDL_clamp(cameraPosition->y, 0, maxAllowedCameraY);
+}
