@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         windowHeight,
         SDL_WINDOW_SHOWN
     );
-    if (window == NULL){
+    if (window == NULL) {
         std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         return 1;
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE
     );
-    if (renderer == nullptr){
+    if (renderer == NULL) {
         std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -79,7 +79,9 @@ int main(int argc, char *argv[]) {
         level->constrainCameraToLevel(&worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, renderTexture);
-        level->render(renderer, &worldCameraPosition);
+        level->clearWithBackgroundColor(renderer);
+        level->renderBackgroundTiles(renderer, &worldCameraPosition);
+        level->renderForegroundTiles(renderer, &worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, NULL);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

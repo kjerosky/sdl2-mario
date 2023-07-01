@@ -36,6 +36,11 @@ Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
         std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
     }
 
+    backgroundTileIds.insert(0);
+    backgroundTileIds.insert(2);
+
+    foregroundTileIds.insert(1);
+
     tileHorizontalPixels = 16;
     tileVerticalPixels = 16;
 
@@ -50,7 +55,26 @@ Level::~Level() {
     SDL_DestroyTexture(levelTiles);
 }
 
-void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
+void Level::clearWithBackgroundColor(SDL_Renderer *renderer) {
+    SDL_SetRenderDrawColor(
+        renderer,
+        backgroundColor.r,
+        backgroundColor.g,
+        backgroundColor.b,
+        backgroundColor.a
+    );
+    SDL_RenderClear(renderer);
+}
+
+void Level::renderBackgroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
+    render(renderer, worldCameraPosition, &backgroundTileIds);
+}
+
+void Level::renderForegroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
+    render(renderer, worldCameraPosition, &foregroundTileIds);
+}
+
+void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition, std::set<int> *tileIdsToRender) {
     GameConfig *gameConfig = GameConfig::getInstance();
     int renderWidth = gameConfig->getRenderWidth();
     int renderHeight = gameConfig->getRenderHeight();
@@ -63,9 +87,6 @@ void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
     int topMostTileY = std::max(worldCameraPosition->y / tileVerticalPixels, 0);
     int bottomMostTileY = std::min(topMostTileY + visibleVerticalTiles, verticalTileCount - 1);
 
-    SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
-    SDL_RenderClear(renderer);
-
     SDL_Rect sourceRect = {0, 0, tileHorizontalPixels, tileVerticalPixels};
     for (int y = topMostTileY; y <= bottomMostTileY; y++) {
         for (int x = leftMostTileX; x <= rightMostTileX; x++) {
@@ -74,7 +95,12 @@ void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition) {
                 continue;
             }
 
-            sourceRect.x = tileData[tileDataIndex] * tileHorizontalPixels;
+            int tileId = tileData[tileDataIndex];
+            if (tileIdsToRender->find(tileId) == tileIdsToRender->end()) {
+                continue;
+            }
+
+            sourceRect.x = tileId * tileHorizontalPixels;
 
             SDL_Rect destinationRect = {
                 x * tileHorizontalPixels - worldCameraPosition->x,
