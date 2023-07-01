@@ -3,7 +3,9 @@ EXECUTABLE = mario
 CPP_FILES = \
 	main.cpp \
 	Level.cpp \
-	GameConfig.cpp
+	GameConfig.cpp \
+	Player.cpp \
+	GameObjectsManager.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

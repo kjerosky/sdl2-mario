@@ -4,6 +4,8 @@
 
 #include "GameConfig.h"
 #include "Level.h"
+#include "GameObjectsManager.h"
+#include "Player.h"
 
 int main(int argc, char *argv[]) {
 
@@ -63,7 +65,9 @@ int main(int argc, char *argv[]) {
     Level *level = new Level(renderer, "assets/test-level-tiles.png");
     SDL_Point worldCameraPosition = {0, 0};
 
-    const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
+    GameObjectsManager objects;
+    SDL_Point initialPlayerPosition = {1 * 16, 9 * 16};
+    objects.add(new Player(renderer, &initialPlayerPosition));
 
     SDL_Event event;
     bool shouldQuit = false;
@@ -74,13 +78,14 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        worldCameraPosition.x += keyboardState[SDL_SCANCODE_D] - keyboardState[SDL_SCANCODE_A];
-        worldCameraPosition.y += keyboardState[SDL_SCANCODE_S] - keyboardState[SDL_SCANCODE_W];
+        objects.updateAll(&worldCameraPosition);
+
         level->constrainCameraToLevel(&worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, renderTexture);
         level->clearWithBackgroundColor(renderer);
         level->renderBackgroundTiles(renderer, &worldCameraPosition);
+        objects.drawAll(renderer, &worldCameraPosition);
         level->renderForegroundTiles(renderer, &worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, NULL);
