@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
     SDL_Point worldCameraPosition = {0, 0};
 
     GameObjectsManager objects;
-    SDL_Point initialPlayerPosition = {1 * 16, 9 * 16};
-    objects.add(new Player(renderer, &initialPlayerPosition));
+    SDL_FPoint initialPlayerPosition = {2 * 16, 2 * 16};
+    objects.add(new Player(renderer, level, &initialPlayerPosition));
 
     SDL_Event event;
     bool shouldQuit = false;

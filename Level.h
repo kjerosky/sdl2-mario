@@ -15,6 +15,7 @@ public:
     void clearWithBackgroundColor(SDL_Renderer *renderer);
     void renderBackgroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
     void renderForegroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
+    bool isWorldPositionInForegroundTile(SDL_Point *worldPosition);
 
 private:
 
