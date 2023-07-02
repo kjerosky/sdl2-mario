@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     SDL_Point worldCameraPosition = {0, 0};
 
     GameObjectsManager objects;
-    SDL_FPoint initialPlayerPosition = {2 * 16, 2 * 16};
+    SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
     objects.add(new Player(renderer, level, &initialPlayerPosition));
 
     Input* input = Input::getInstance();

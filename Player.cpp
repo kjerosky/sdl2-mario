@@ -15,6 +15,8 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 
     facingRight = true;
 
+    isGrounded = true;
+
     smallSizeDownCollisionChecksCount = 2;
     smallSizeDownCollisionChecks = new SDL_Point[smallSizeDownCollisionChecksCount];
     smallSizeDownCollisionChecks[0].x = 2;
@@ -77,21 +79,43 @@ void Player::update(SDL_Point *cameraPosition) {
     }
 
     //TODO THIS IS TESTING ONLY
-    velocity.y += 0.1; //fake gravity
-    position.y += velocity.y;
+    isGrounded = false;
     for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
         SDL_Point testPoint = {
-            (int)position.x + smallSizeDownCollisionChecks[i].x,
-            (int)position.y + smallSizeDownCollisionChecks[i].y,
+            (int)position.x + collisionCheckPoint.x,
+            (int)position.y + collisionCheckPoint.y + 1,
         };
         if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
-            velocity.y = 0;
+            isGrounded = true;
+            break;
+        }
+    }
+    if (isGrounded && input->jumpWasPressed()) {
+        velocity.y = -3.7; //fake jump velocity
+    } else {
+        velocity.y += 0.1; //fake gravity effect
+    }
+    position.y += velocity.y;
+    bool isMovingUpwards = velocity.y < 0;
+    for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
+        if (isMovingUpwards) {
+            collisionCheckPoint.y = 15 - collisionCheckPoint.y;
+        }
+
+        SDL_Point testPoint = {
+            (int)position.x + collisionCheckPoint.x,
+            (int)position.y + collisionCheckPoint.y,
+        };
+        if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+            velocity.y = isMovingUpwards ? 3 : 0;
             position.y = (int)position.y;
 
-            testPoint.x = (int)position.x + smallSizeDownCollisionChecks[i].x;
+            testPoint.x = (int)position.x + collisionCheckPoint.x;
             do {
-                position.y--;
-                testPoint.y = (int)position.y + smallSizeDownCollisionChecks[i].y;
+                position.y += isMovingUpwards ? 1 : -1;
+                testPoint.y = (int)position.y + collisionCheckPoint.y;
             } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
             break;
         }

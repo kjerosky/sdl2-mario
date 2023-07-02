@@ -23,6 +23,8 @@ private:
     bool facingRight;
     SDL_Texture* spriteSheet;
 
+    bool isGrounded;
+
     SDL_Point *smallSizeDownCollisionChecks;
     int smallSizeDownCollisionChecksCount;
     SDL_Point *smallSizeRightCollisionChecks;

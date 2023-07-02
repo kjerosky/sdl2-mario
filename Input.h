@@ -16,6 +16,8 @@ public:
     bool upIsHeld();
     bool downIsHeld();
 
+    bool jumpWasPressed();
+
 private:
 
     Input();
@@ -27,11 +29,15 @@ private:
     SDL_Scancode rightScancode;
     SDL_Scancode upScancode;
     SDL_Scancode downScancode;
+    SDL_Scancode jumpScancode;
 
     bool leftHeld;
     bool rightHeld;
     bool upHeld;
     bool downHeld;
+    bool jumpPressed;
+
+    Uint8 previousJumpState;
 };
 
 #endif
