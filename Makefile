@@ -5,7 +5,8 @@ CPP_FILES = \
 	Level.cpp \
 	GameConfig.cpp \
 	Player.cpp \
-	GameObjectsManager.cpp
+	GameObjectsManager.cpp \
+	Input.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

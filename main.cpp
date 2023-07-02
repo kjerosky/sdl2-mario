@@ -6,6 +6,7 @@
 #include "Level.h"
 #include "GameObjectsManager.h"
 #include "Player.h"
+#include "Input.h"
 
 int main(int argc, char *argv[]) {
 
@@ -69,6 +70,8 @@ int main(int argc, char *argv[]) {
     SDL_FPoint initialPlayerPosition = {2 * 16, 2 * 16};
     objects.add(new Player(renderer, level, &initialPlayerPosition));
 
+    Input* input = Input::getInstance();
+
     SDL_Event event;
     bool shouldQuit = false;
     while (!shouldQuit) {
@@ -77,6 +80,8 @@ int main(int argc, char *argv[]) {
                 shouldQuit = true;
             }
         }
+
+        input->update();
 
         objects.updateAll(&worldCameraPosition);
 

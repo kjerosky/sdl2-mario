@@ -2,7 +2,9 @@
 
 #include <SDL_image.h>
 #include <iostream>
+
 #include "GameConfig.h"
+#include "Input.h"
 
 Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position) {
     this->currentLevel = currentLevel;
@@ -31,8 +33,6 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     if (!spriteSheet) {
         std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
     }
-
-    keyboardState = SDL_GetKeyboardState(NULL);
 }
 
 Player::~Player() {
@@ -42,7 +42,8 @@ Player::~Player() {
 void Player::update(SDL_Point *cameraPosition) {
     int renderWidth = GameConfig::getInstance()->getRenderWidth();
 
-    int horizontalInput = keyboardState[SDL_SCANCODE_D] - keyboardState[SDL_SCANCODE_A];
+    Input *input = Input::getInstance();
+    int horizontalInput = (input->rightIsHeld() ? 1 : 0) - (input->leftIsHeld() ? 1 : 0);
 
     //TODO THIS IS TESTING ONLY
     if (horizontalInput != 0) {

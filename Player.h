@@ -29,7 +29,6 @@ private:
     int smallSizeRightCollisionChecksCount;
 
     Level *currentLevel;
-    const Uint8* keyboardState;
 };
 
 #endif
