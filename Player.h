@@ -26,6 +26,8 @@ private:
 
     SDL_Texture* smallMarioSpriteSheet;
     Animator* smallMarioStandingAnimator;
+    Animator* smallMarioWalkingAnimator;
+    Animator* smallMarioJumpingAnimator;
 
     Animator* currentAnimator;
 

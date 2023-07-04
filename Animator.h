@@ -10,6 +10,7 @@ public:
     Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, float frameTime, int *frameIndices, int frameIndicesCount);
     ~Animator();
 
+    void reset();
     void update();
     void draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally);
 

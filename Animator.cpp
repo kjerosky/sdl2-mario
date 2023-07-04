@@ -14,12 +14,17 @@ Animator::Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, 
     memcpy(this->frameIndices, frameIndices, frameIndicesCount * sizeof(int));
 
     this->frameTime = frameTime;
-    currentFrameIndex = 0;
-    frameTimeRemaining = frameTime;
+
+    reset();
 }
 
 Animator::~Animator() {
     delete[] frameIndices;
+}
+
+void Animator::reset() {
+    currentFrameIndex = 0;
+    frameTimeRemaining = frameTime;
 }
 
 void Animator::update() {

@@ -36,9 +36,17 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
         std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
     }
 
-    int smallMarioStandingFrames[] = {1, 2, 3, 2};
+    int smallMarioStandingFrames[] = {0};
     int smallMarioStandingFramesCount = sizeof(smallMarioStandingFrames) / sizeof(int);
-    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioStandingFrames, smallMarioStandingFramesCount);
+    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 1.0f, smallMarioStandingFrames, smallMarioStandingFramesCount);
+
+    int smallMarioWalkingFrames[] = {1, 2, 3, 2};
+    int smallMarioWalkingFramesCount = sizeof(smallMarioWalkingFrames) / sizeof(int);
+    smallMarioWalkingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioWalkingFrames, smallMarioWalkingFramesCount);
+
+    int smallMarioJumpingFrames[] = {5};
+    int smallMarioJumpingFramesCount = sizeof(smallMarioJumpingFrames) / sizeof(int);
+    smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
 
     currentAnimator = smallMarioStandingAnimator;
 }
@@ -50,6 +58,8 @@ Player::~Player() {
 }
 
 void Player::update(SDL_Point *cameraPosition) {
+    Animator *previousAnimator = currentAnimator;
+
     int renderWidth = GameConfig::getInstance()->getRenderWidth();
 
     Input *input = Input::getInstance();
@@ -131,7 +141,21 @@ void Player::update(SDL_Point *cameraPosition) {
 
     cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
 
-    currentAnimator->update();
+    if (isGrounded) {
+        if (velocity.x != 0) {
+            currentAnimator = smallMarioWalkingAnimator;
+        } else {
+            currentAnimator = smallMarioStandingAnimator;
+        }
+    } else {
+        currentAnimator = smallMarioJumpingAnimator;
+    }
+
+    if (previousAnimator != currentAnimator) {
+        currentAnimator->reset();
+    } else {
+        currentAnimator->update();
+    }
 }
 
 void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
