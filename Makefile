@@ -6,7 +6,9 @@ CPP_FILES = \
 	GameConfig.cpp \
 	Player.cpp \
 	GameObjectsManager.cpp \
-	Input.cpp
+	Input.cpp \
+	Animator.cpp \
+	Time.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

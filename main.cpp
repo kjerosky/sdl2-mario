@@ -7,6 +7,7 @@
 #include "GameObjectsManager.h"
 #include "Player.h"
 #include "Input.h"
+#include "Time.h"
 
 int main(int argc, char *argv[]) {
 
@@ -70,6 +71,7 @@ int main(int argc, char *argv[]) {
     SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
     objects.add(new Player(renderer, level, &initialPlayerPosition));
 
+    Time::initialize();
     Input* input = Input::getInstance();
 
     SDL_Event event;
@@ -81,6 +83,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        Time::update();
         input->update();
 
         objects.updateAll(&worldCameraPosition);

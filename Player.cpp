@@ -31,14 +31,22 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     smallSizeRightCollisionChecks[1].x = 13;
     smallSizeRightCollisionChecks[1].y = 15;
 
-    spriteSheet = IMG_LoadTexture(renderer, "assets/mario.png");
-    if (!spriteSheet) {
+    smallMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/small-mario.png");
+    if (!smallMarioSpriteSheet) {
         std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
     }
+
+    int smallMarioStandingFrames[] = {1, 2, 3, 2};
+    int smallMarioStandingFramesCount = sizeof(smallMarioStandingFrames) / sizeof(int);
+    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioStandingFrames, smallMarioStandingFramesCount);
+
+    currentAnimator = smallMarioStandingAnimator;
 }
 
 Player::~Player() {
-    SDL_DestroyTexture(spriteSheet);
+    SDL_DestroyTexture(smallMarioSpriteSheet);
+
+    delete smallMarioStandingAnimator;
 }
 
 void Player::update(SDL_Point *cameraPosition) {
@@ -122,14 +130,15 @@ void Player::update(SDL_Point *cameraPosition) {
     }
 
     cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
+
+    currentAnimator->update();
 }
 
 void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
-    SDL_Rect destinationRectangle = {
+    SDL_Point spritePosition = {
         position.x - cameraPosition->x,
-        position.y - cameraPosition->y,
-        16,
-        16
+        position.y - cameraPosition->y
     };
-    SDL_RenderCopyEx(renderer, spriteSheet, NULL, &destinationRectangle, 0, NULL, facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+
+    currentAnimator->draw(renderer, &spritePosition, !facingRight);
 }

@@ -5,6 +5,7 @@
 
 #include "GameObject.h"
 #include "Level.h"
+#include "Animator.h"
 
 class Player : public GameObject {
 
@@ -21,9 +22,12 @@ private:
     SDL_FPoint position;
     SDL_FPoint velocity;
     bool facingRight;
-    SDL_Texture* spriteSheet;
-
     bool isGrounded;
+
+    SDL_Texture* smallMarioSpriteSheet;
+    Animator* smallMarioStandingAnimator;
+
+    Animator* currentAnimator;
 
     SDL_Point *smallSizeDownCollisionChecks;
     int smallSizeDownCollisionChecksCount;
