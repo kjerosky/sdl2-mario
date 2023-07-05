@@ -6,6 +6,7 @@
 #include "Level.h"
 #include "GameObjectsManager.h"
 #include "Player.h"
+#include "Goomba.h"
 #include "Input.h"
 #include "Time.h"
 
@@ -70,6 +71,9 @@ int main(int argc, char *argv[]) {
     GameObjectsManager objects;
     SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
     objects.add(new Player(renderer, level, &initialPlayerPosition));
+
+    SDL_FPoint initialGoombaPosition = {10 * 16, 0 * 16};
+    objects.add(new Goomba(renderer, level, &initialGoombaPosition));
 
     Time::initialize();
     Input* input = Input::getInstance();

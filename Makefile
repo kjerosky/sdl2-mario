@@ -8,7 +8,8 @@ CPP_FILES = \
 	GameObjectsManager.cpp \
 	Input.cpp \
 	Animator.cpp \
-	Time.cpp
+	Time.cpp \
+	Goomba.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

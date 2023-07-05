@@ -7,8 +7,8 @@
 #include "Input.h"
 
 Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position) {
-    this->currentLevel = currentLevel;
     this->position = *position;
+    this->currentLevel = currentLevel;
 
     velocity.x = 0;
     velocity.y = 0;
@@ -54,7 +54,12 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 Player::~Player() {
     SDL_DestroyTexture(smallMarioSpriteSheet);
 
+    delete[] smallSizeDownCollisionChecks;
+    delete[] smallSizeRightCollisionChecks;
+
     delete smallMarioStandingAnimator;
+    delete smallMarioWalkingAnimator;
+    delete smallMarioJumpingAnimator;
 }
 
 void Player::update(SDL_Point *cameraPosition) {
