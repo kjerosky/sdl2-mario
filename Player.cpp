@@ -6,9 +6,10 @@
 #include "GameConfig.h"
 #include "Input.h"
 
-Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position) {
+Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, std::vector<GameObject*>* objectsList) {
     this->position = *position;
     this->currentLevel = currentLevel;
+    this->objectsList = objectsList;
 
     velocity.x = 0;
     velocity.y = 0;
@@ -30,6 +31,13 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     smallSizeRightCollisionChecks[0].y = 0;
     smallSizeRightCollisionChecks[1].x = 13;
     smallSizeRightCollisionChecks[1].y = 15;
+
+    smallMarioHitBox.x = 2;
+    smallMarioHitBox.y = 0;
+    smallMarioHitBox.w = 12;
+    smallMarioHitBox.h = 16;
+
+    currentHitBox = &smallMarioHitBox;
 
     smallMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/small-mario.png");
     if (!smallMarioSpriteSheet) {
@@ -60,6 +68,38 @@ Player::~Player() {
     delete smallMarioStandingAnimator;
     delete smallMarioWalkingAnimator;
     delete smallMarioJumpingAnimator;
+}
+
+GameObject::Type Player::getType() {
+    return PLAYER;
+}
+
+SDL_Rect* Player::getHitBox() {
+    return currentHitBox;
+}
+
+bool Player::isStompable() {
+    return true;
+}
+
+GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
+    GameObject::CollisionResponse response;
+    GameObject::Type sourceType = sourceObject->getType();
+    switch (sourceType) {
+        case ENEMY:
+            if (sourceObject->isStompable() && velocity.y > 0) {
+                response = GET_STOMPED;
+            } else {
+                response = NO_PROBLEM;
+                std::cout << "Player taking damage from enemy!" << std::endl;
+            }
+            break;
+        default:
+            response = NO_PROBLEM;
+            break;
+    }
+
+    return response;
 }
 
 void Player::update(SDL_Point *cameraPosition) {
@@ -109,13 +149,16 @@ void Player::update(SDL_Point *cameraPosition) {
             (int)position.x + collisionCheckPoint.x,
             (int)position.y + collisionCheckPoint.y + 1,
         };
-        if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+        if (currentLevel->isWorldPositionInForegroundTile(&testPoint) && velocity.y >= 0) {
+            velocity.y = 0;
             isGrounded = true;
             break;
         }
     }
-    if (isGrounded && input->jumpWasPressed()) {
-        velocity.y = -3.7; //fake jump velocity
+    if (isGrounded) {
+        if (input->jumpWasPressed()) {
+            velocity.y = -3.7; //fake jump velocity
+        }
     } else {
         velocity.y += 0.1; //fake gravity effect
     }
@@ -145,6 +188,39 @@ void Player::update(SDL_Point *cameraPosition) {
     }
 
     cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
+
+    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
+        if (*currentObject == this) {
+            continue;
+        }
+
+        SDL_Rect myWorldHitBox = *getHitBox();
+        myWorldHitBox.x += position.x;
+        myWorldHitBox.y += position.y;
+        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
+        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
+        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
+        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
+            continue;
+        }
+
+        GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
+        switch (collisionResponse) {
+            case NO_PROBLEM:
+                // no need to react
+                break;
+            case REACT_TO_STOMP:
+                velocity.y = -2.0f; // fake bounce velocity
+                break;
+            case TAKE_DAMAGE:
+                std::cout << "player takes damage" << std::endl;
+                //TODO
+                break;
+            default:
+                std::cerr << "[ERROR] Player received unknown collision response: " << collisionResponse << std::endl;
+                break;
+        }
+    }
 
     if (isGrounded) {
         if (velocity.x != 0) {

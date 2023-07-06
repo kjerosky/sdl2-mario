@@ -14,6 +14,10 @@ void GameObjectsManager::add(GameObject *object) {
     objects.push_back(object);
 }
 
+std::vector<GameObject*>* GameObjectsManager::getObjectList() {
+    return &objects;
+}
+
 void GameObjectsManager::updateAll(SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         (*object)->update(cameraPosition);

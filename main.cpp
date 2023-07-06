@@ -69,11 +69,17 @@ int main(int argc, char *argv[]) {
     SDL_Point worldCameraPosition = {0, 0};
 
     GameObjectsManager objects;
+    std::vector<GameObject*>* objectsList = objects.getObjectList();
     SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
-    objects.add(new Player(renderer, level, &initialPlayerPosition));
+    objects.add(new Player(renderer, level, &initialPlayerPosition, objectsList));
 
     SDL_FPoint initialGoombaPosition = {10 * 16, 0 * 16};
-    objects.add(new Goomba(renderer, level, &initialGoombaPosition));
+    objects.add(new Goomba(renderer, level, &initialGoombaPosition, objectsList));
+
+    SDL_FPoint initialGoombaPosition2 = {9 * 16, 9 * 16};
+    objects.add(new Goomba(renderer, level, &initialGoombaPosition2, objectsList));
+    SDL_FPoint initialGoombaPosition3 = {10 * 16, 9 * 16};
+    objects.add(new Goomba(renderer, level, &initialGoombaPosition3, objectsList));
 
     Time::initialize();
     Input* input = Input::getInstance();
