@@ -1,20 +1,19 @@
 #include "Time.h"
 
-Uint64 Time::previousTimestamp;
 float Time::deltaTime;
+Uint64 Time::frameMilliseconds;
+Uint64 Time::frameEndTimestamp;
 
-void Time::initialize() {
-    previousTimestamp = SDL_GetTicks64();
+void Time::initialize(int maxFps) {
+    frameMilliseconds = (1.0f / maxFps) * 1000;
+    deltaTime = 1.0f / maxFps;
 }
 
-void Time::pause() {
-    previousTimestamp = SDL_GetTicks64();
-    deltaTime = 0.0f;
+void Time::signalFrameStart() {
+    frameEndTimestamp = SDL_GetTicks64() + frameMilliseconds;
 }
 
-void Time::update() {
-    Uint64 currentTimestamp = SDL_GetTicks64();
-    deltaTime = (currentTimestamp - previousTimestamp) / 1000.0f;
-
-    previousTimestamp = currentTimestamp;
+void Time::waitUntilFrameEnd() {
+    while (SDL_GetTicks64() <= frameEndTimestamp)
+        ;
 }

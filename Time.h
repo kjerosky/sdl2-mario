@@ -7,15 +7,16 @@ class Time {
 
 public:
 
-    static void initialize();
-    static void pause();
-    static void update();
+    static void initialize(int maxFps);
+    static void signalFrameStart();
+    static void waitUntilFrameEnd();
 
     static float deltaTime;
 
 private:
 
-    static Uint64 previousTimestamp;
+    static Uint64 frameMilliseconds;
+    static Uint64 frameEndTimestamp;
 };
 
 #endif

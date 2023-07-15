@@ -81,19 +81,20 @@ int main(int argc, char *argv[]) {
     SDL_FPoint initialGoombaPosition3 = {10 * 16, 9 * 16};
     objects.add(new Goomba(renderer, level, &initialGoombaPosition3, objectsList));
 
-    Time::initialize();
+    Time::initialize(60);
     Input* input = Input::getInstance();
 
     SDL_Event event;
     bool shouldQuit = false;
     while (!shouldQuit) {
+        Time::signalFrameStart();
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 shouldQuit = true;
             }
         }
 
-        Time::update();
         input->update();
 
         objects.updateAll(&worldCameraPosition);
@@ -111,6 +112,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, renderTexture, NULL, NULL);
         SDL_RenderPresent(renderer);
+
+        Time::waitUntilFrameEnd();
     }
 
     delete level;
