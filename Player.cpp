@@ -88,6 +88,7 @@ GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject)
     switch (sourceType) {
         case ENEMY:
             if (sourceObject->isStompable() && velocity.y > 0) {
+                velocity.y = -2.0f; // fake bounce velocity
                 response = GET_STOMPED;
             } else {
                 response = NO_PROBLEM;
