@@ -5,12 +5,16 @@
 
 #include "Time.h"
 
+const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
+const float Goomba::GRAVITY = 0.1f;
+const Uint64 Goomba::STOMPED_TIME = 1000;
+
 Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, std::vector<GameObject*>* objectsList) {
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsList = objectsList;
 
-    velocity.x = -0.5f; // fake velocity
+    velocity.x = HORIZONTAL_VELOCITY;
     velocity.y = 0;
 
     downCollisionChecksCount = 2;
@@ -77,130 +81,167 @@ GameObject::CollisionResponse Goomba::receiveCollision(GameObject* sourceObject)
         return NO_PROBLEM;
     }
 
-    GameObject::CollisionResponse response;
+    GameObject::CollisionResponse response = NO_PROBLEM;
     GameObject::Type sourceType = sourceObject->getType();
     switch (sourceType) {
-        case PLAYER:
-            if ((int)(sourceObject->getVelocity()->y) > 0) {
+        case PLAYER: {
+            bool isPlayerFalling = sourceObject->getVelocity()->y > 0;
+            if (isPlayerFalling) {
                 response = REACT_TO_STOMP;
 
-                state = STOMPED;
                 stompedTimer = STOMPED_TIME;
+                state = STOMPED;
             } else {
                 response = TAKE_DAMAGE;
             }
-            break;
-        case ENEMY:
+        } break;
+        case ENEMY: {
             velocity.x = -velocity.x;
             response = REVERSE_COURSE;
-            break;
-        default:
+        } break;
+        default: {
             response = NO_PROBLEM;
-            break;
+        } break;
     }
 
     return response;
 }
 
 void Goomba::update(SDL_Point *cameraPosition) {
-    Animator* previousAnimator = currentAnimator;
+    checkStateTransitions();
+    processCurrentState();
+    animateSprite();
+}
 
-    if (state == WALKING) {
-        //TODO THIS IS TESTING ONLY
-        position.x += velocity.x;
-        for (int i = 0; i < leftCollisionChecksCount; i++) {
-            SDL_Point collisionCheckPoint = leftCollisionChecks[i];
-            if (velocity.x > 0) {
-                collisionCheckPoint.x = 15 - collisionCheckPoint.x;
+void Goomba::checkStateTransitions() {
+    switch (state) {
+        case WALKING:
+            // nothing to do - transitions are handled through collisions
+            break;
+        case STOMPED:
+            if (stompedTimer <= 0) {
+                state = DEAD;
             }
+            break;
+        case DEAD:
+            // nothing to do
+            break;
+    }
+}
 
-            SDL_Point testPoint = {
-                (int)position.x + collisionCheckPoint.x,
-                (int)position.y + collisionCheckPoint.y,
-            };
-            if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
-                position.x = (int)position.x;
+void Goomba::processCurrentState() {
+    switch (state) {
+        case WALKING:
+            applyHorizontalMovement();
+            applyVerticalMovement();
+            resolveCollisions();
+            break;
+        case STOMPED:
+            applyVerticalMovement();
+            stompedTimer -= Time::deltaTime * 1000.0f;
+            break;
+        case DEAD:
+            // nothing to do
+            break;
+    }
+}
 
+void Goomba::applyHorizontalMovement() {
+    position.x += velocity.x;
+    for (int i = 0; i < leftCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = leftCollisionChecks[i];
+        if (velocity.x > 0) {
+            collisionCheckPoint.x = 15 - collisionCheckPoint.x;
+        }
+
+        SDL_Point testPoint = {
+            (int)position.x + collisionCheckPoint.x,
+            (int)position.y + collisionCheckPoint.y,
+        };
+        if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+            position.x = (int)position.x;
+
+            testPoint.y = (int)position.y + collisionCheckPoint.y;
+            do {
+                position.x += velocity.x < 0 ? 1 : -1;
+                testPoint.x = (int)position.x + collisionCheckPoint.x;
+            } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
+
+            velocity.x = -velocity.x;
+            break;
+        }
+    }
+}
+
+void Goomba::applyVerticalMovement() {
+    velocity.y += GRAVITY;
+    position.y += velocity.y;
+    for (int i = 0; i < downCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = downCollisionChecks[i];
+
+        SDL_Point testPoint = {
+            (int)position.x + collisionCheckPoint.x,
+            (int)position.y + collisionCheckPoint.y,
+        };
+        if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+            velocity.y = 0;
+            position.y = (int)position.y;
+
+            testPoint.x = (int)position.x + collisionCheckPoint.x;
+            do {
+                position.y--;
                 testPoint.y = (int)position.y + collisionCheckPoint.y;
-                do {
-                    position.x += velocity.x < 0 ? 1 : -1;
-                    testPoint.x = (int)position.x + collisionCheckPoint.x;
-                } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
+            } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
+            break;
+        }
+    }
+}
 
+void Goomba::resolveCollisions() {
+    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
+        if (*currentObject == this) {
+            continue;
+        }
+
+        SDL_Rect myWorldHitBox = *getHitBox();
+        myWorldHitBox.x += position.x;
+        myWorldHitBox.y += position.y;
+        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
+        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
+        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
+        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
+            continue;
+        }
+
+        GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
+        switch (collisionResponse) {
+            case NO_PROBLEM:
+                // no need to react
+                break;
+            case REVERSE_COURSE:
                 velocity.x = -velocity.x;
                 break;
-            }
-        }
-
-        //TODO THIS IS TESTING ONLY
-        velocity.y += 0.1; // fake gravity effect
-        position.y += velocity.y;
-        for (int i = 0; i < downCollisionChecksCount; i++) {
-            SDL_Point collisionCheckPoint = downCollisionChecks[i];
-
-            SDL_Point testPoint = {
-                (int)position.x + collisionCheckPoint.x,
-                (int)position.y + collisionCheckPoint.y,
-            };
-            if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
-                velocity.y = 0;
-                position.y = (int)position.y;
-
-                testPoint.x = (int)position.x + collisionCheckPoint.x;
-                do {
-                    position.y--;
-                    testPoint.y = (int)position.y + collisionCheckPoint.y;
-                } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
+            case GET_STOMPED:
+                state = STOMPED;
+                stompedTimer = STOMPED_TIME;
                 break;
-            }
+            case TAKE_DAMAGE:
+                //TODO
+                std::cout << "Goomba takes damage" << std::endl;
+                break;
+            default:
+                std::cerr << "[ERROR] Goomba received unknown collision response: " << collisionResponse << std::endl;
+                break;
         }
-
-        for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-            if (*currentObject == this) {
-                continue;
-            }
-
-            SDL_Rect myWorldHitBox = *getHitBox();
-            myWorldHitBox.x += position.x;
-            myWorldHitBox.y += position.y;
-            SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
-            otherWorldHitBox.x += (*currentObject)->getPosition()->x;
-            otherWorldHitBox.y += (*currentObject)->getPosition()->y;
-            if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
-                continue;
-            }
-
-            GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
-            switch (collisionResponse) {
-                case NO_PROBLEM:
-                    // no need to react
-                    break;
-                case REVERSE_COURSE:
-                    velocity.x = -velocity.x;
-                    break;
-                case GET_STOMPED:
-                    state = STOMPED;
-                    stompedTimer = STOMPED_TIME;
-                    break;
-                case TAKE_DAMAGE:
-                    std::cout << "Goomba takes damage" << std::endl;
-                    //TODO
-                    break;
-                default:
-                    std::cerr << "[ERROR] Goomba received unknown collision response: " << collisionResponse << std::endl;
-                    break;
-            }
-        }
-    } else if (state == STOMPED) {
-        currentAnimator = stompedAnimator;
-        stompedTimer -= Time::deltaTime * 1000.0f;
-        if (stompedTimer <= 0) {
-            state = DEAD;
-        }
-    } else if (state == DEAD) {
-        return;
     }
+}
 
+void Goomba::animateSprite() {
+    Animator* previousAnimator = currentAnimator;
+
+    if (state == STOMPED) {
+        currentAnimator = stompedAnimator;
+    }
 
     if (previousAnimator != currentAnimator) {
         currentAnimator->reset();

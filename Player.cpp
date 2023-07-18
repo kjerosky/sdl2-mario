@@ -115,12 +115,10 @@ GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject)
 void Player::update(SDL_Point *cameraPosition) {
     checkStateTransitions();
     processCurrentState();
-
     resolveCollisions();
+    animateSprite();
 
     centerCameraOnPlayer(cameraPosition);
-
-    animateSprite();
 }
 
 void Player::checkStateTransitions() {
@@ -269,19 +267,14 @@ void Player::resolveCollisions() {
                 velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
                 break;
             case TAKE_DAMAGE:
-                std::cout << "player takes damage" << std::endl;
                 //TODO
+                std::cout << "player takes damage" << std::endl;
                 break;
             default:
                 std::cerr << "[ERROR] Player received unknown collision response: " << collisionResponse << std::endl;
                 break;
         }
     }
-}
-
-void Player::centerCameraOnPlayer(SDL_Point* cameraPosition) {
-    int renderWidth = GameConfig::getInstance()->getRenderWidth();
-    cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
 }
 
 void Player::animateSprite() {
@@ -302,6 +295,11 @@ void Player::animateSprite() {
     } else {
         currentAnimator->update();
     }
+}
+
+void Player::centerCameraOnPlayer(SDL_Point* cameraPosition) {
+    int renderWidth = GameConfig::getInstance()->getRenderWidth();
+    cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
 }
 
 void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {

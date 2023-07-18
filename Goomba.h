@@ -24,13 +24,24 @@ public:
 
 private:
 
+    const static float HORIZONTAL_VELOCITY;
+    const static float GRAVITY;
+    const static Uint64 STOMPED_TIME;
+
     enum GoombaState {
         WALKING,
         STOMPED,
         DEAD
     };
+    GoombaState state;
 
-    const static Uint64 STOMPED_TIME = 1000;
+    void checkStateTransitions();
+    void processCurrentState();
+
+    void applyHorizontalMovement();
+    void applyVerticalMovement();
+    void resolveCollisions();
+    void animateSprite();
 
     Uint64 stompedTimer;
 
@@ -50,8 +61,6 @@ private:
     Level* currentLevel;
 
     std::vector<GameObject*>* objectsList;
-
-    GoombaState state;
 };
 
 #endif

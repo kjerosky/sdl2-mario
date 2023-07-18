@@ -46,8 +46,8 @@ private:
     void applyHorizontalMovement();
     void applyVerticalMovement(float gravity);
     void resolveCollisions();
-    void centerCameraOnPlayer(SDL_Point* cameraPosition);
     void animateSprite();
+    void centerCameraOnPlayer(SDL_Point* cameraPosition);
 
     Input* input;
 
