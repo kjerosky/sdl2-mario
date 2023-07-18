@@ -24,6 +24,7 @@ Input::Input() {
     upHeld = false;
     downHeld = false;
     jumpPressed = false;
+    jumpReleased = false;
 
     previousJumpState = 0;
 }
@@ -36,6 +37,7 @@ void Input::update() {
 
     Uint8 currentJumpState = keyboardState[jumpScancode];
     jumpPressed = !previousJumpState && currentJumpState;
+    jumpReleased = previousJumpState && !currentJumpState;
 
     previousJumpState = currentJumpState;
 }
@@ -58,4 +60,8 @@ bool Input::downIsHeld() {
 
 bool Input::jumpWasPressed() {
     return jumpPressed;
+}
+
+bool Input::jumpWasReleased() {
+    return jumpReleased;
 }

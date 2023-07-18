@@ -4,7 +4,12 @@
 #include <iostream>
 
 #include "GameConfig.h"
-#include "Input.h"
+
+const float Player::JUMP_VELOCITY = -3.7f;
+const float Player::BONK_VELOCITY = 3.0f;
+const float Player::JUMP_GRAVITY = 0.1f;
+const float Player::FALL_GRAVITY = 0.3f;
+const float Player::STOMP_REACTION_VELOCITY = -3.0f;
 
 Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, std::vector<GameObject*>* objectsList) {
     this->position = *position;
@@ -57,6 +62,10 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
 
     currentAnimator = smallMarioStandingAnimator;
+
+    state = ON_GROUND;
+
+    input = Input::getInstance();
 }
 
 Player::~Player() {
@@ -88,7 +97,7 @@ GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject)
     switch (sourceType) {
         case ENEMY:
             if (sourceObject->isStompable() && velocity.y > 0) {
-                velocity.y = -2.0f; // fake bounce velocity
+                velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
                 response = GET_STOMPED;
             } else {
                 response = NO_PROBLEM;
@@ -104,11 +113,74 @@ GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject)
 }
 
 void Player::update(SDL_Point *cameraPosition) {
-    Animator *previousAnimator = currentAnimator;
+    checkStateTransitions();
+    processCurrentState();
 
-    int renderWidth = GameConfig::getInstance()->getRenderWidth();
+    resolveCollisions();
 
-    Input *input = Input::getInstance();
+    centerCameraOnPlayer(cameraPosition);
+
+    animateSprite();
+}
+
+void Player::checkStateTransitions() {
+    switch (state) {
+        case ON_GROUND:
+            if (input->jumpWasPressed()) {
+                velocity.y = JUMP_VELOCITY;
+                state = JUMPING;
+            } else if (!isOnGround()) {
+                state = FALLING;
+            }
+            break;
+        case JUMPING:
+            if (input->jumpWasReleased() || velocity.y > 0) {
+                state = FALLING;
+            }
+            break;
+        case FALLING:
+            if (isOnGround()) {
+                state = ON_GROUND;
+            }
+            break;
+    }
+}
+
+void Player::processCurrentState() {
+    switch (state) {
+        case ON_GROUND:
+            applyHorizontalMovement();
+            applyVerticalMovement(FALL_GRAVITY);
+            break;
+        case JUMPING:
+            applyHorizontalMovement();
+            applyVerticalMovement(JUMP_GRAVITY);
+            break;
+        case FALLING:
+            applyHorizontalMovement();
+            applyVerticalMovement(FALL_GRAVITY);
+            break;
+    }
+}
+
+bool Player::isOnGround() {
+    bool isGrounded = false;
+    for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
+        SDL_Point testPoint = {
+            (int)position.x + collisionCheckPoint.x,
+            (int)position.y + collisionCheckPoint.y + 1,
+        };
+        if (currentLevel->isWorldPositionInForegroundTile(&testPoint) && velocity.y >= 0) {
+            isGrounded = true;
+            break;
+        }
+    }
+
+    return isGrounded;
+}
+
+void Player::applyHorizontalMovement() {
     int horizontalInput = (input->rightIsHeld() ? 1 : 0) - (input->leftIsHeld() ? 1 : 0);
 
     //TODO THIS IS TESTING ONLY
@@ -141,29 +213,12 @@ void Player::update(SDL_Point *cameraPosition) {
             break;
         }
     }
+}
 
-    //TODO THIS IS TESTING ONLY
-    isGrounded = false;
-    for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
-        SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
-        SDL_Point testPoint = {
-            (int)position.x + collisionCheckPoint.x,
-            (int)position.y + collisionCheckPoint.y + 1,
-        };
-        if (currentLevel->isWorldPositionInForegroundTile(&testPoint) && velocity.y >= 0) {
-            velocity.y = 0;
-            isGrounded = true;
-            break;
-        }
-    }
-    if (isGrounded) {
-        if (input->jumpWasPressed()) {
-            velocity.y = -3.7; //fake jump velocity
-        }
-    } else {
-        velocity.y += 0.1; //fake gravity effect
-    }
+void Player::applyVerticalMovement(float gravity) {
+    velocity.y += gravity;
     position.y += velocity.y;
+
     bool isMovingUpwards = velocity.y < 0;
     for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
         SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
@@ -176,7 +231,7 @@ void Player::update(SDL_Point *cameraPosition) {
             (int)position.y + collisionCheckPoint.y,
         };
         if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
-            velocity.y = isMovingUpwards ? 3 : 0;
+            velocity.y = isMovingUpwards ? BONK_VELOCITY : 0;
             position.y = (int)position.y;
 
             testPoint.x = (int)position.x + collisionCheckPoint.x;
@@ -187,9 +242,9 @@ void Player::update(SDL_Point *cameraPosition) {
             break;
         }
     }
+}
 
-    cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
-
+void Player::resolveCollisions() {
     for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
         if (*currentObject == this) {
             continue;
@@ -211,7 +266,7 @@ void Player::update(SDL_Point *cameraPosition) {
                 // no need to react
                 break;
             case REACT_TO_STOMP:
-                velocity.y = -2.0f; // fake bounce velocity
+                velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
                 break;
             case TAKE_DAMAGE:
                 std::cout << "player takes damage" << std::endl;
@@ -222,8 +277,17 @@ void Player::update(SDL_Point *cameraPosition) {
                 break;
         }
     }
+}
 
-    if (isGrounded) {
+void Player::centerCameraOnPlayer(SDL_Point* cameraPosition) {
+    int renderWidth = GameConfig::getInstance()->getRenderWidth();
+    cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
+}
+
+void Player::animateSprite() {
+    Animator *previousAnimator = currentAnimator;
+
+    if (state == ON_GROUND) {
         if (velocity.x != 0) {
             currentAnimator = smallMarioWalkingAnimator;
         } else {

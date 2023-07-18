@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "Level.h"
 #include "Animator.h"
+#include "Input.h"
 
 class Player : public GameObject {
 
@@ -23,6 +24,32 @@ public:
     void draw(SDL_Renderer *renderer, SDL_Point *cameraPosition);
 
 private:
+
+    const static float JUMP_VELOCITY;
+    const static float BONK_VELOCITY;
+    const static float JUMP_GRAVITY;
+    const static float FALL_GRAVITY;
+    const static float STOMP_REACTION_VELOCITY;
+
+    enum PlayerState {
+        ON_GROUND,
+        JUMPING,
+        FALLING,
+    };
+    PlayerState state;
+
+    void checkStateTransitions();
+    void processCurrentState();
+
+    bool isOnGround();
+
+    void applyHorizontalMovement();
+    void applyVerticalMovement(float gravity);
+    void resolveCollisions();
+    void centerCameraOnPlayer(SDL_Point* cameraPosition);
+    void animateSprite();
+
+    Input* input;
 
     bool facingRight;
     bool isGrounded;

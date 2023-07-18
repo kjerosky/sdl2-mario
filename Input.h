@@ -17,6 +17,7 @@ public:
     bool downIsHeld();
 
     bool jumpWasPressed();
+    bool jumpWasReleased();
 
 private:
 
@@ -36,6 +37,7 @@ private:
     bool upHeld;
     bool downHeld;
     bool jumpPressed;
+    bool jumpReleased;
 
     Uint8 previousJumpState;
 };
