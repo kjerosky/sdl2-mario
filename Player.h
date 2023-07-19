@@ -8,12 +8,13 @@
 #include "Level.h"
 #include "Animator.h"
 #include "Input.h"
+#include "GameObjectsManager.h"
 
 class Player : public GameObject {
 
 public:
 
-    Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, std::vector<GameObject*>* objectsList);
+    Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager);
     ~Player();
 
     GameObject::Type getType();
@@ -72,6 +73,7 @@ private:
 
     Level *currentLevel;
 
+    GameObjectsManager* objectsManager;
     std::vector<GameObject*>* objectsList;
 };
 

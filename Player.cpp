@@ -11,10 +11,11 @@ const float Player::JUMP_GRAVITY = 0.1f;
 const float Player::FALL_GRAVITY = 0.3f;
 const float Player::STOMP_REACTION_VELOCITY = -3.0f;
 
-Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, std::vector<GameObject*>* objectsList) {
+Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
     this->position = *position;
     this->currentLevel = currentLevel;
-    this->objectsList = objectsList;
+    this->objectsManager = objectsManager;
+    this->objectsList = objectsManager->getObjectList();
 
     velocity.x = 0;
     velocity.y = 0;

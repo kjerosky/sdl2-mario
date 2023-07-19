@@ -13,14 +13,17 @@ public:
     ~GameObjectsManager();
 
     void add(GameObject *object);
+    void destroy(GameObject *object);
     std::vector<GameObject*>* getObjectList();
 
     void updateAll(SDL_Point *cameraPosition);
     void drawAll(SDL_Renderer *renderer, SDL_Point *cameraPosition);
+    void cleanupDestroyedObjects();
 
 private:
 
     std::vector<GameObject*> objects;
+    std::vector<GameObject*> objectsToDestroy;
 };
 
 #endif

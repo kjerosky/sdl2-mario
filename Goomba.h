@@ -7,12 +7,13 @@
 #include "GameObject.h"
 #include "Level.h"
 #include "Animator.h"
+#include "GameObjectsManager.h"
 
 class Goomba : public GameObject {
 
 public:
 
-    Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, std::vector<GameObject*>* objectsList);
+    Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager);
     ~Goomba();
 
     GameObject::Type getType();
@@ -60,6 +61,7 @@ private:
 
     Level* currentLevel;
 
+    GameObjectsManager* objectsManager;
     std::vector<GameObject*>* objectsList;
 };
 

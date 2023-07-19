@@ -9,10 +9,11 @@ const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
 const Uint64 Goomba::STOMPED_TIME = 1000;
 
-Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, std::vector<GameObject*>* objectsList) {
+Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager) {
     this->position = *position;
     this->currentLevel = currentLevel;
-    this->objectsList = objectsList;
+    this->objectsManager = objectsManager;
+    this->objectsList = objectsManager->getObjectList();
 
     velocity.x = HORIZONTAL_VELOCITY;
     velocity.y = 0;
@@ -141,7 +142,7 @@ void Goomba::processCurrentState() {
             stompedTimer -= Time::deltaTime * 1000.0f;
             break;
         case DEAD:
-            // nothing to do
+            objectsManager->destroy(this);
             break;
     }
 }
