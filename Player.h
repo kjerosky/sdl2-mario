@@ -42,8 +42,7 @@ private:
     void checkStateTransitions();
     void processCurrentState();
 
-    bool isOnGround();
-
+    void updateGroundStatus();
     void applyHorizontalMovement();
     void applyVerticalMovement(float gravity);
     void resolveCollisions();

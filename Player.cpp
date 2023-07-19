@@ -114,6 +114,7 @@ GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject)
 }
 
 void Player::update(SDL_Point *cameraPosition) {
+    updateGroundStatus();
     checkStateTransitions();
     processCurrentState();
     resolveCollisions();
@@ -127,8 +128,9 @@ void Player::checkStateTransitions() {
         case ON_GROUND:
             if (input->jumpWasPressed()) {
                 velocity.y = JUMP_VELOCITY;
+                isGrounded = false;
                 state = JUMPING;
-            } else if (!isOnGround()) {
+            } else if (!isGrounded) {
                 state = FALLING;
             }
             break;
@@ -138,7 +140,7 @@ void Player::checkStateTransitions() {
             }
             break;
         case FALLING:
-            if (isOnGround()) {
+            if (isGrounded) {
                 state = ON_GROUND;
             }
             break;
@@ -162,8 +164,8 @@ void Player::processCurrentState() {
     }
 }
 
-bool Player::isOnGround() {
-    bool isGrounded = false;
+void Player::updateGroundStatus() {
+    isGrounded = false;
     for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
         SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
         SDL_Point testPoint = {
@@ -175,8 +177,6 @@ bool Player::isOnGround() {
             break;
         }
     }
-
-    return isGrounded;
 }
 
 void Player::applyHorizontalMovement() {
@@ -215,6 +215,10 @@ void Player::applyHorizontalMovement() {
 }
 
 void Player::applyVerticalMovement(float gravity) {
+    if (isGrounded) {
+        return;
+    }
+
     velocity.y += gravity;
     position.y += velocity.y;
 
