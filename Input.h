@@ -19,6 +19,8 @@ public:
     bool jumpWasPressed();
     bool jumpWasReleased();
 
+    bool DEBUG_buttonWasPressed();
+
 private:
 
     Input();
@@ -40,6 +42,11 @@ private:
     bool jumpReleased;
 
     Uint8 previousJumpState;
+
+    //TODO REMOVE THIS EVENTUALLY
+    SDL_Scancode DEBUG_scancode;
+    bool DEBUG_buttonPressed;
+    Uint8 previous_DEBUG_buttonState;
 };
 
 #endif

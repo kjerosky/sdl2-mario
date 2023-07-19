@@ -31,6 +31,7 @@ private:
     const static float JUMP_GRAVITY;
     const static float FALL_GRAVITY;
     const static float STOMP_REACTION_VELOCITY;
+    const static int SPRITE_WIDTH;
 
     enum PlayerState {
         ON_GROUND,
@@ -38,6 +39,12 @@ private:
         FALLING,
     };
     PlayerState state;
+
+    enum PowerState {
+        SMALL_MARIO,
+        SUPER_MARIO,
+    };
+    PowerState powerState;
 
     void checkStateTransitions();
     void processCurrentState();
@@ -49,6 +56,9 @@ private:
     void animateSprite();
     void centerCameraOnPlayer(SDL_Point* cameraPosition);
 
+    void powerUp();
+    void powerDown();
+
     Input* input;
 
     bool facingRight;
@@ -59,6 +69,11 @@ private:
     Animator* smallMarioWalkingAnimator;
     Animator* smallMarioJumpingAnimator;
 
+    SDL_Texture* superMarioSpriteSheet;
+    Animator* superMarioStandingAnimator;
+    Animator* superMarioWalkingAnimator;
+    Animator* superMarioJumpingAnimator;
+
     Animator* currentAnimator;
 
     SDL_Point *smallSizeDownCollisionChecks;
@@ -66,9 +81,22 @@ private:
     SDL_Point *smallSizeRightCollisionChecks;
     int smallSizeRightCollisionChecksCount;
 
+    SDL_Point *poweredUpDownCollisionChecks;
+    int poweredUpDownCollisionChecksCount;
+    SDL_Point *poweredUpRightCollisionChecks;
+    int poweredUpRightCollisionChecksCount;
+
+    int currentDownCollisionChecksCount;
+    SDL_Point** currentDownCollisionChecks;
+    int currentRightCollisionChecksCount;
+    SDL_Point** currentRightCollisionChecks;
+
     SDL_Rect smallMarioHitBox;
+    SDL_Rect poweredUpMarioHitBox;
 
     SDL_Rect* currentHitBox;
+
+    int currentSpriteHeight;
 
     Level *currentLevel;
 

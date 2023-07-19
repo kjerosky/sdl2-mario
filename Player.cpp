@@ -10,6 +10,7 @@ const float Player::BONK_VELOCITY = 3.0f;
 const float Player::JUMP_GRAVITY = 0.1f;
 const float Player::FALL_GRAVITY = 0.3f;
 const float Player::STOMP_REACTION_VELOCITY = -3.0f;
+const int Player::SPRITE_WIDTH = 16;
 
 Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
     this->position = *position;
@@ -32,21 +33,54 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     smallSizeDownCollisionChecks[1].y = 15;
 
     smallSizeRightCollisionChecksCount = 2;
-    smallSizeRightCollisionChecks = new SDL_Point[smallSizeDownCollisionChecksCount];
+    smallSizeRightCollisionChecks = new SDL_Point[smallSizeRightCollisionChecksCount];
     smallSizeRightCollisionChecks[0].x = 13;
     smallSizeRightCollisionChecks[0].y = 0;
     smallSizeRightCollisionChecks[1].x = 13;
     smallSizeRightCollisionChecks[1].y = 15;
+
+    poweredUpDownCollisionChecksCount = 2;
+    poweredUpDownCollisionChecks = new SDL_Point[poweredUpDownCollisionChecksCount];
+    poweredUpDownCollisionChecks[0].x = 2;
+    poweredUpDownCollisionChecks[0].y = 31;
+    poweredUpDownCollisionChecks[1].x = 13;
+    poweredUpDownCollisionChecks[1].y = 31;
+
+    poweredUpRightCollisionChecksCount = 4;
+    poweredUpRightCollisionChecks = new SDL_Point[poweredUpRightCollisionChecksCount];
+    poweredUpRightCollisionChecks[0].x = 13;
+    poweredUpRightCollisionChecks[0].y = 0;
+    poweredUpRightCollisionChecks[1].x = 13;
+    poweredUpRightCollisionChecks[1].y = 10;
+    poweredUpRightCollisionChecks[2].x = 13;
+    poweredUpRightCollisionChecks[2].y = 20;
+    poweredUpRightCollisionChecks[3].x = 13;
+    poweredUpRightCollisionChecks[3].y = 31;
+
+    currentDownCollisionChecksCount = smallSizeDownCollisionChecksCount;
+    currentDownCollisionChecks = &smallSizeDownCollisionChecks;
+    currentRightCollisionChecksCount = smallSizeRightCollisionChecksCount;
+    currentRightCollisionChecks = &smallSizeRightCollisionChecks;
 
     smallMarioHitBox.x = 2;
     smallMarioHitBox.y = 0;
     smallMarioHitBox.w = 12;
     smallMarioHitBox.h = 16;
 
+    poweredUpMarioHitBox.x = 2;
+    poweredUpMarioHitBox.y = 0;
+    poweredUpMarioHitBox.w = 12;
+    poweredUpMarioHitBox.h = 32;
+
     currentHitBox = &smallMarioHitBox;
 
     smallMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/small-mario.png");
     if (!smallMarioSpriteSheet) {
+        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
+    }
+
+    superMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/super-mario.png");
+    if (!superMarioSpriteSheet) {
         std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
     }
 
@@ -62,7 +96,21 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     int smallMarioJumpingFramesCount = sizeof(smallMarioJumpingFrames) / sizeof(int);
     smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
 
+    int superMarioStandingFrames[] = {0};
+    int superMarioStandingFramesCount = sizeof(superMarioStandingFrames) / sizeof(int);
+    superMarioStandingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 1.0f, superMarioStandingFrames, superMarioStandingFramesCount);
+
+    int superMarioWalkingFrames[] = {3, 1, 2};
+    int superMarioWalkingFramesCount = sizeof(superMarioWalkingFrames) / sizeof(int);
+    superMarioWalkingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 0.1f, superMarioWalkingFrames, superMarioWalkingFramesCount);
+
+    int superMarioJumpingFrames[] = {5};
+    int superMarioJumpingFramesCount = sizeof(superMarioJumpingFrames) / sizeof(int);
+    superMarioJumpingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 0.1f, superMarioJumpingFrames, superMarioJumpingFramesCount);
+
+    powerState = SMALL_MARIO;
     currentAnimator = smallMarioStandingAnimator;
+    currentSpriteHeight = 16;
 
     state = ON_GROUND;
 
@@ -75,9 +123,16 @@ Player::~Player() {
     delete[] smallSizeDownCollisionChecks;
     delete[] smallSizeRightCollisionChecks;
 
+    delete[] poweredUpDownCollisionChecks;
+    delete[] poweredUpRightCollisionChecks;
+
     delete smallMarioStandingAnimator;
     delete smallMarioWalkingAnimator;
     delete smallMarioJumpingAnimator;
+
+    delete superMarioStandingAnimator;
+    delete superMarioWalkingAnimator;
+    delete superMarioJumpingAnimator;
 }
 
 GameObject::Type Player::getType() {
@@ -166,8 +221,8 @@ void Player::processCurrentState() {
 
 void Player::updateGroundStatus() {
     isGrounded = false;
-    for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
-        SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
+    for (int i = 0; i < currentDownCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = (*currentDownCollisionChecks)[i];
         SDL_Point testPoint = {
             (int)position.x + collisionCheckPoint.x,
             (int)position.y + collisionCheckPoint.y + 1,
@@ -190,10 +245,10 @@ void Player::applyHorizontalMovement() {
         velocity.x = 0;
     }
     position.x += velocity.x;
-    for (int i = 0; i < smallSizeRightCollisionChecksCount; i++) {
-        SDL_Point collisionCheckPoint = smallSizeRightCollisionChecks[i];
+    for (int i = 0; i < currentRightCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = (*currentRightCollisionChecks)[i];
         if (!facingRight) {
-            collisionCheckPoint.x = 15 - collisionCheckPoint.x;
+            collisionCheckPoint.x = (SPRITE_WIDTH - 1) - collisionCheckPoint.x;
         }
 
         SDL_Point testPoint = {
@@ -223,10 +278,10 @@ void Player::applyVerticalMovement(float gravity) {
     position.y += velocity.y;
 
     bool isMovingUpwards = velocity.y < 0;
-    for (int i = 0; i < smallSizeDownCollisionChecksCount; i++) {
-        SDL_Point collisionCheckPoint = smallSizeDownCollisionChecks[i];
+    for (int i = 0; i < currentDownCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = (*currentDownCollisionChecks)[i];
         if (isMovingUpwards) {
-            collisionCheckPoint.y = 15 - collisionCheckPoint.y;
+            collisionCheckPoint.y = (currentSpriteHeight - 1) - collisionCheckPoint.y;
         }
 
         SDL_Point testPoint = {
@@ -280,19 +335,41 @@ void Player::resolveCollisions() {
                 break;
         }
     }
+
+    if (powerState == SMALL_MARIO && input->DEBUG_buttonWasPressed()) {
+        powerUp();
+    } else if (powerState == SUPER_MARIO && input->DEBUG_buttonWasPressed()) {
+        powerDown();
+    }
 }
 
 void Player::animateSprite() {
     Animator *previousAnimator = currentAnimator;
 
-    if (state == ON_GROUND) {
-        if (velocity.x != 0) {
-            currentAnimator = smallMarioWalkingAnimator;
-        } else {
-            currentAnimator = smallMarioStandingAnimator;
-        }
-    } else {
-        currentAnimator = smallMarioJumpingAnimator;
+    switch (powerState) {
+        case SMALL_MARIO: {
+            if (state == ON_GROUND) {
+                if (velocity.x != 0) {
+                    currentAnimator = smallMarioWalkingAnimator;
+                } else {
+                    currentAnimator = smallMarioStandingAnimator;
+                }
+            } else {
+                currentAnimator = smallMarioJumpingAnimator;
+            }
+        } break;
+
+        case SUPER_MARIO: {
+            if (state == ON_GROUND) {
+                if (velocity.x != 0) {
+                    currentAnimator = superMarioWalkingAnimator;
+                } else {
+                    currentAnimator = superMarioStandingAnimator;
+                }
+            } else {
+                currentAnimator = superMarioJumpingAnimator;
+            }
+        } break;
     }
 
     if (previousAnimator != currentAnimator) {
@@ -305,6 +382,28 @@ void Player::animateSprite() {
 void Player::centerCameraOnPlayer(SDL_Point* cameraPosition) {
     int renderWidth = GameConfig::getInstance()->getRenderWidth();
     cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
+}
+
+void Player::powerUp() {
+    powerState = SUPER_MARIO;
+    position.y -= 16;
+    currentSpriteHeight = 32;
+    currentDownCollisionChecksCount = poweredUpDownCollisionChecksCount;
+    currentDownCollisionChecks = &poweredUpDownCollisionChecks;
+    currentRightCollisionChecksCount = poweredUpRightCollisionChecksCount;
+    currentRightCollisionChecks = &poweredUpRightCollisionChecks;
+    currentHitBox = &poweredUpMarioHitBox;
+}
+
+void Player::powerDown() {
+    powerState = SMALL_MARIO;
+    position.y += 16;
+    currentSpriteHeight = 16;
+    currentDownCollisionChecksCount = smallSizeDownCollisionChecksCount;
+    currentDownCollisionChecks = &smallSizeDownCollisionChecks;
+    currentRightCollisionChecksCount = smallSizeRightCollisionChecksCount;
+    currentRightCollisionChecks = &smallSizeRightCollisionChecks;
+    currentHitBox = &smallMarioHitBox;
 }
 
 void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
