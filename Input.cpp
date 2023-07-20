@@ -28,9 +28,12 @@ Input::Input() {
 
     previousJumpState = 0;
 
-    DEBUG_scancode = SDL_SCANCODE_SPACE;
-    DEBUG_buttonPressed = false;
-    previous_DEBUG_buttonState = 0;
+    DEBUG_plus_scancode = SDL_SCANCODE_EQUALS;
+    DEBUG_plus_buttonPressed = false;
+    previous_DEBUG_plus_buttonState = 0;
+    DEBUG_minus_scancode = SDL_SCANCODE_MINUS;
+    DEBUG_minus_buttonPressed = false;
+    previous_DEBUG_minus_buttonState = 0;
 }
 
 void Input::update() {
@@ -44,9 +47,12 @@ void Input::update() {
     jumpReleased = previousJumpState && !currentJumpState;
     previousJumpState = currentJumpState;
 
-    Uint8 current_DEBUG_buttonState = keyboardState[DEBUG_scancode];
-    DEBUG_buttonPressed = !previous_DEBUG_buttonState && current_DEBUG_buttonState;
-    previous_DEBUG_buttonState = current_DEBUG_buttonState;
+    Uint8 current_DEBUG_plus_buttonState = keyboardState[DEBUG_plus_scancode];
+    DEBUG_plus_buttonPressed = !previous_DEBUG_plus_buttonState && current_DEBUG_plus_buttonState;
+    previous_DEBUG_plus_buttonState = current_DEBUG_plus_buttonState;
+    Uint8 current_DEBUG_minus_buttonState = keyboardState[DEBUG_minus_scancode];
+    DEBUG_minus_buttonPressed = !previous_DEBUG_minus_buttonState && current_DEBUG_minus_buttonState;
+    previous_DEBUG_minus_buttonState = current_DEBUG_minus_buttonState;
 }
 
 bool Input::leftIsHeld() {
@@ -73,6 +79,11 @@ bool Input::jumpWasReleased() {
     return jumpReleased;
 }
 
-bool Input::DEBUG_buttonWasPressed() {
-    return DEBUG_buttonPressed;
+bool Input::DEBUG_plus_buttonWasPressed() {
+    return DEBUG_plus_buttonPressed;
+}
+
+bool Input::DEBUG_minus_buttonWasPressed()
+{
+    return DEBUG_minus_buttonPressed;
 }

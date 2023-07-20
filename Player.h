@@ -43,6 +43,7 @@ private:
     enum PowerState {
         SMALL_MARIO,
         SUPER_MARIO,
+        FIRE_MARIO,
     };
     PowerState powerState;
 
@@ -73,6 +74,11 @@ private:
     Animator* superMarioStandingAnimator;
     Animator* superMarioWalkingAnimator;
     Animator* superMarioJumpingAnimator;
+
+    SDL_Texture* fireMarioSpriteSheet;
+    Animator* fireMarioStandingAnimator;
+    Animator* fireMarioWalkingAnimator;
+    Animator* fireMarioJumpingAnimator;
 
     Animator* currentAnimator;
 
