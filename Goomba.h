@@ -27,7 +27,7 @@ private:
 
     const static float HORIZONTAL_VELOCITY;
     const static float GRAVITY;
-    const static Uint64 STOMPED_TIME;
+    const static Uint64 STOMPED_FRAMES;
 
     enum GoombaState {
         WALKING,
@@ -43,8 +43,6 @@ private:
     void applyVerticalMovement();
     void resolveCollisions();
     void animateSprite();
-
-    Uint64 stompedTimer;
 
     SDL_Texture* spriteSheet;
     Animator* walkingAnimator;

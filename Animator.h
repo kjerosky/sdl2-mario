@@ -7,11 +7,11 @@ class Animator {
 
 public:
 
-    Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, float frameTime, int *frameIndices, int frameIndicesCount);
+    Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, int framesPerAnimationFrame, int *frameIndices, int frameIndicesCount);
     ~Animator();
 
     void reset();
-    void update();
+    bool update();
     void draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally);
 
 private:
@@ -22,10 +22,10 @@ private:
 
     int *frameIndices;
     int frameIndicesCount;
-    float frameTime;
+    int framesPerAnimationFrame;
 
+    int framesRemaining;
     int currentFrameIndex;
-    float frameTimeRemaining;
 };
 
 #endif

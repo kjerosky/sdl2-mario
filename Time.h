@@ -11,8 +11,6 @@ public:
     static void signalFrameStart();
     static void waitUntilFrameEnd();
 
-    static float deltaTime;
-
 private:
 
     static Uint64 frameMilliseconds;

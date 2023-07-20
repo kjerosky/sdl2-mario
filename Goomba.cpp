@@ -7,7 +7,7 @@
 
 const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
-const Uint64 Goomba::STOMPED_TIME = 1000;
+const Uint64 Goomba::STOMPED_FRAMES = 60;
 
 Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager) {
     this->position = *position;
@@ -44,11 +44,11 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
 
     int walkingFrames[] = {0, 1};
     int walkingFramesCount = sizeof(walkingFrames) / sizeof(int);
-    walkingAnimator = new Animator(spriteSheet, 16, 16, 0.15f, walkingFrames, walkingFramesCount);
+    walkingAnimator = new Animator(spriteSheet, 16, 16, 8, walkingFrames, walkingFramesCount);
 
     int stompedFrames[] = {2};
     int stompedFramesCount = sizeof(stompedFrames) / sizeof(int);
-    stompedAnimator = new Animator(spriteSheet, 16, 16, 1.0f, stompedFrames, stompedFramesCount);
+    stompedAnimator = new Animator(spriteSheet, 16, 16, 60, stompedFrames, stompedFramesCount);
 
     currentAnimator = walkingAnimator;
 
@@ -89,8 +89,6 @@ GameObject::CollisionResponse Goomba::receiveCollision(GameObject* sourceObject)
             bool isPlayerFalling = sourceObject->getVelocity()->y > 0;
             if (isPlayerFalling) {
                 response = REACT_TO_STOMP;
-
-                stompedTimer = STOMPED_TIME;
                 state = STOMPED;
             } else {
                 response = TAKE_DAMAGE;
@@ -117,12 +115,10 @@ void Goomba::update(SDL_Point *cameraPosition) {
 void Goomba::checkStateTransitions() {
     switch (state) {
         case WALKING:
-            // nothing to do - transitions are handled through collisions
+            // nothing to do - transition is handled through collisions
             break;
         case STOMPED:
-            if (stompedTimer <= 0) {
-                state = DEAD;
-            }
+            // nothing to do - transition is set by the animator
             break;
         case DEAD:
             // nothing to do
@@ -139,7 +135,6 @@ void Goomba::processCurrentState() {
             break;
         case STOMPED:
             applyVerticalMovement();
-            stompedTimer -= Time::deltaTime * 1000.0f;
             break;
         case DEAD:
             objectsManager->destroy(this);
@@ -224,7 +219,6 @@ void Goomba::resolveCollisions() {
                 break;
             case GET_STOMPED:
                 state = STOMPED;
-                stompedTimer = STOMPED_TIME;
                 break;
             case TAKE_DAMAGE:
                 //TODO
@@ -247,7 +241,10 @@ void Goomba::animateSprite() {
     if (previousAnimator != currentAnimator) {
         currentAnimator->reset();
     } else {
-        currentAnimator->update();
+        bool animationComplete = currentAnimator->update();
+        if (animationComplete && currentAnimator == stompedAnimator) {
+            state = DEAD;
+        }
     }
 }
 

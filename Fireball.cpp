@@ -24,11 +24,11 @@ Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *posi
 
     int movingFrames[] = {0, 1, 2, 3};
     int movingFramesCount = sizeof(movingFrames) / sizeof(int);
-    movingAnimator = new Animator(spriteSheet, 16, 16, 0.067, movingFrames, movingFramesCount);
+    movingAnimator = new Animator(spriteSheet, 16, 16, 4, movingFrames, movingFramesCount);
 
     int explodingFrames[] = {4, 5, 6};
     int explodingFramesCount = sizeof(explodingFrames) / sizeof(int);
-    explodingAnimator = new Animator(spriteSheet, 16, 16, 0.067, explodingFrames, explodingFramesCount);
+    explodingAnimator = new Animator(spriteSheet, 16, 16, 2, explodingFrames, explodingFramesCount);
 
     currentAnimator = movingAnimator;
 
@@ -85,11 +85,12 @@ void Fireball::update(SDL_Point *cameraPosition) {
     if (previouslyExploding != exploding) {
         position.y -= 4;
         currentAnimator = explodingAnimator;
-    } else if (exploding) {
-        //TODO
     }
 
-    currentAnimator->update();
+    bool animationComplete = currentAnimator->update();
+    if (exploding && animationComplete) {
+        objectsManager->destroy(this);
+    }
 }
 
 void Fireball::applyHorizontalMovement() {

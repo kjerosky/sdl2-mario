@@ -95,43 +95,43 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 
     int smallMarioStandingFrames[] = {0};
     int smallMarioStandingFramesCount = sizeof(smallMarioStandingFrames) / sizeof(int);
-    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 1.0f, smallMarioStandingFrames, smallMarioStandingFramesCount);
+    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 1, smallMarioStandingFrames, smallMarioStandingFramesCount);
 
     int smallMarioWalkingFrames[] = {1, 2, 3, 2};
     int smallMarioWalkingFramesCount = sizeof(smallMarioWalkingFrames) / sizeof(int);
-    smallMarioWalkingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioWalkingFrames, smallMarioWalkingFramesCount);
+    smallMarioWalkingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 6, smallMarioWalkingFrames, smallMarioWalkingFramesCount);
 
     int smallMarioJumpingFrames[] = {5};
     int smallMarioJumpingFramesCount = sizeof(smallMarioJumpingFrames) / sizeof(int);
-    smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 0.1f, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
+    smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 1, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
 
     int superMarioStandingFrames[] = {0};
     int superMarioStandingFramesCount = sizeof(superMarioStandingFrames) / sizeof(int);
-    superMarioStandingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 1.0f, superMarioStandingFrames, superMarioStandingFramesCount);
+    superMarioStandingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 1, superMarioStandingFrames, superMarioStandingFramesCount);
 
     int superMarioWalkingFrames[] = {3, 1, 2};
     int superMarioWalkingFramesCount = sizeof(superMarioWalkingFrames) / sizeof(int);
-    superMarioWalkingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 0.1f, superMarioWalkingFrames, superMarioWalkingFramesCount);
+    superMarioWalkingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 6, superMarioWalkingFrames, superMarioWalkingFramesCount);
 
     int superMarioJumpingFrames[] = {5};
     int superMarioJumpingFramesCount = sizeof(superMarioJumpingFrames) / sizeof(int);
-    superMarioJumpingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 0.1f, superMarioJumpingFrames, superMarioJumpingFramesCount);
+    superMarioJumpingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 1, superMarioJumpingFrames, superMarioJumpingFramesCount);
 
     int fireMarioStandingFrames[] = {0};
     int fireMarioStandingFramesCount = sizeof(fireMarioStandingFrames) / sizeof(int);
-    fireMarioStandingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1.0f, fireMarioStandingFrames, fireMarioStandingFramesCount);
+    fireMarioStandingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1, fireMarioStandingFrames, fireMarioStandingFramesCount);
 
     int fireMarioWalkingFrames[] = {3, 1, 2};
     int fireMarioWalkingFramesCount = sizeof(fireMarioWalkingFrames) / sizeof(int);
-    fireMarioWalkingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 0.1f, fireMarioWalkingFrames, fireMarioWalkingFramesCount);
+    fireMarioWalkingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 6, fireMarioWalkingFrames, fireMarioWalkingFramesCount);
 
     int fireMarioJumpingFrames[] = {5};
     int fireMarioJumpingFramesCount = sizeof(fireMarioJumpingFrames) / sizeof(int);
-    fireMarioJumpingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 0.1f, fireMarioJumpingFrames, fireMarioJumpingFramesCount);
+    fireMarioJumpingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1, fireMarioJumpingFrames, fireMarioJumpingFramesCount);
 
     int fireMarioThrowingFireballFrames[] = {15};
     int fireMarioThrowingFireballCount = sizeof(fireMarioThrowingFireballFrames) / sizeof(int);
-    fireMarioThrowingFireballAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 0.1f, fireMarioThrowingFireballFrames, fireMarioThrowingFireballCount);
+    fireMarioThrowingFireballAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1, fireMarioThrowingFireballFrames, fireMarioThrowingFireballCount);
 
     powerState = SMALL_MARIO;
     currentAnimator = smallMarioStandingAnimator;

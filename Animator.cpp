@@ -2,18 +2,15 @@
 
 #include <string.h>
 
-#include "Time.h"
-
-Animator::Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, float frameTime, int *frameIndices, int frameIndicesCount) {
+Animator::Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, int framesPerAnimationFrame, int *frameIndices, int frameIndicesCount) {
     this->spriteSheet = spriteSheet;
     this->spriteWidth = spriteWidth;
     this->spriteHeight = spriteHeight;
+    this->framesPerAnimationFrame = framesPerAnimationFrame;
 
     this->frameIndicesCount = frameIndicesCount;
     this->frameIndices = new int[frameIndicesCount];
     memcpy(this->frameIndices, frameIndices, frameIndicesCount * sizeof(int));
-
-    this->frameTime = frameTime;
 
     reset();
 }
@@ -24,15 +21,24 @@ Animator::~Animator() {
 
 void Animator::reset() {
     currentFrameIndex = 0;
-    frameTimeRemaining = frameTime;
+    framesRemaining = framesPerAnimationFrame;
 }
 
-void Animator::update() {
-    frameTimeRemaining -= Time::deltaTime;
-    while (frameTimeRemaining <= 0) {
-        currentFrameIndex = (currentFrameIndex + 1) % frameIndicesCount;
-        frameTimeRemaining += frameTime;
+bool Animator::update() {
+    bool animationCompleted = false;
+
+    framesRemaining--;
+    if (framesRemaining <= 0) {
+        currentFrameIndex++;
+        if (currentFrameIndex >= frameIndicesCount) {
+            animationCompleted = true;
+            currentFrameIndex = 0;
+        }
+        framesRemaining = framesPerAnimationFrame;
     }
+
+    // animation completed status
+    return animationCompleted;
 }
 
 void Animator::draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally) {
