@@ -11,6 +11,7 @@ const float Player::JUMP_GRAVITY = 0.1f;
 const float Player::FALL_GRAVITY = 0.3f;
 const float Player::STOMP_REACTION_VELOCITY = -3.0f;
 const int Player::SPRITE_WIDTH = 16;
+const int Player::THROW_FIREBALL_FRAME_COUNT = 7;
 
 Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
     this->position = *position;
@@ -125,11 +126,17 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     int fireMarioJumpingFramesCount = sizeof(fireMarioJumpingFrames) / sizeof(int);
     fireMarioJumpingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 0.1f, fireMarioJumpingFrames, fireMarioJumpingFramesCount);
 
+    int fireMarioThrowingFireballFrames[] = {15};
+    int fireMarioThrowingFireballCount = sizeof(fireMarioThrowingFireballFrames) / sizeof(int);
+    fireMarioThrowingFireballAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 0.1f, fireMarioThrowingFireballFrames, fireMarioThrowingFireballCount);
+
     powerState = SMALL_MARIO;
     currentAnimator = smallMarioStandingAnimator;
     currentSpriteHeight = 16;
 
     state = ON_GROUND;
+
+    throwFireballFramesLeft = 0;
 
     input = Input::getInstance();
 }
@@ -152,6 +159,11 @@ Player::~Player() {
     delete superMarioStandingAnimator;
     delete superMarioWalkingAnimator;
     delete superMarioJumpingAnimator;
+
+    delete fireMarioStandingAnimator;
+    delete fireMarioWalkingAnimator;
+    delete fireMarioJumpingAnimator;
+    delete fireMarioThrowingFireballAnimator;
 }
 
 GameObject::Type Player::getType() {
@@ -226,14 +238,17 @@ void Player::processCurrentState() {
         case ON_GROUND:
             applyHorizontalMovement();
             applyVerticalMovement(FALL_GRAVITY);
+            attemptFireballThrow();
             break;
         case JUMPING:
             applyHorizontalMovement();
             applyVerticalMovement(JUMP_GRAVITY);
+            attemptFireballThrow();
             break;
         case FALLING:
             applyHorizontalMovement();
             applyVerticalMovement(FALL_GRAVITY);
+            attemptFireballThrow();
             break;
     }
 }
@@ -391,7 +406,10 @@ void Player::animateSprite() {
         } break;
 
         case FIRE_MARIO: {
-            if (state == ON_GROUND) {
+            if (throwFireballFramesLeft > 0) {
+                currentAnimator = fireMarioThrowingFireballAnimator;
+                throwFireballFramesLeft--;
+            } else if (state == ON_GROUND) {
                 if (velocity.x != 0) {
                     currentAnimator = fireMarioWalkingAnimator;
                 } else {
@@ -413,6 +431,14 @@ void Player::animateSprite() {
 void Player::centerCameraOnPlayer(SDL_Point* cameraPosition) {
     int renderWidth = GameConfig::getInstance()->getRenderWidth();
     cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
+}
+
+void Player::attemptFireballThrow() {
+    if (powerState != FIRE_MARIO || !input->fireWasPressed()) {
+        return;
+    }
+
+    throwFireballFramesLeft = THROW_FIREBALL_FRAME_COUNT;
 }
 
 void Player::powerUp() {

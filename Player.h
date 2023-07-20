@@ -32,6 +32,7 @@ private:
     const static float FALL_GRAVITY;
     const static float STOMP_REACTION_VELOCITY;
     const static int SPRITE_WIDTH;
+    const static int THROW_FIREBALL_FRAME_COUNT;
 
     enum PlayerState {
         ON_GROUND,
@@ -56,6 +57,7 @@ private:
     void resolveCollisions();
     void animateSprite();
     void centerCameraOnPlayer(SDL_Point* cameraPosition);
+    void attemptFireballThrow();
 
     void powerUp();
     void powerDown();
@@ -79,6 +81,7 @@ private:
     Animator* fireMarioStandingAnimator;
     Animator* fireMarioWalkingAnimator;
     Animator* fireMarioJumpingAnimator;
+    Animator* fireMarioThrowingFireballAnimator;
 
     Animator* currentAnimator;
 
@@ -103,6 +106,8 @@ private:
     SDL_Rect* currentHitBox;
 
     int currentSpriteHeight;
+
+    int throwFireballFramesLeft;
 
     Level *currentLevel;
 

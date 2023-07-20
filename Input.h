@@ -19,6 +19,9 @@ public:
     bool jumpWasPressed();
     bool jumpWasReleased();
 
+    bool fireWasPressed();
+    bool runIsHeld();
+
     bool DEBUG_plus_buttonWasPressed();
     bool DEBUG_minus_buttonWasPressed();
 
@@ -34,6 +37,7 @@ private:
     SDL_Scancode upScancode;
     SDL_Scancode downScancode;
     SDL_Scancode jumpScancode;
+    SDL_Scancode fireAndRunScancode;
 
     bool leftHeld;
     bool rightHeld;
@@ -41,8 +45,11 @@ private:
     bool downHeld;
     bool jumpPressed;
     bool jumpReleased;
+    bool firePressed;
+    bool runHeld;
 
     Uint8 previousJumpState;
+    Uint8 previousFireAndRunState;
 
     //TODO REMOVE THIS EVENTUALLY
     SDL_Scancode DEBUG_plus_scancode;
