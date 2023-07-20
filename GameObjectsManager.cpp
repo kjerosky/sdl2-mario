@@ -11,7 +11,7 @@ GameObjectsManager::~GameObjectsManager() {
 }
 
 void GameObjectsManager::add(GameObject *object) {
-    objects.push_back(object);
+    objectsToAdd.push_back(object);
 }
 
 void GameObjectsManager::destroy(GameObject *object) {
@@ -25,6 +25,16 @@ std::vector<GameObject*>* GameObjectsManager::getObjectList() {
 void GameObjectsManager::updateAll(SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         (*object)->update(cameraPosition);
+    }
+}
+
+void GameObjectsManager::processPendingAdditions() {
+    for (std::vector<GameObject*>::iterator objectToAdd = objectsToAdd.begin(); objectToAdd != objectsToAdd.end(); objectToAdd++) {
+        objects.push_back(*objectToAdd);
+    }
+
+    if (!objectsToAdd.empty()) {
+        objectsToAdd.clear();
     }
 }
 

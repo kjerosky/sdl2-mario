@@ -64,6 +64,9 @@ private:
 
     Input* input;
 
+    //TODO REMOVE THIS WHEN SPRITE SHEETS ARE CENTRALIZED
+    SDL_Renderer* fireballRenderer;
+
     bool facingRight;
     bool isGrounded;
 

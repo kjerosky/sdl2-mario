@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
         input->update();
 
         objects.updateAll(&worldCameraPosition);
+        objects.processPendingAdditions();
 
         level->constrainCameraToLevel(&worldCameraPosition);
 

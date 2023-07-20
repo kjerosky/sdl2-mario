@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "GameConfig.h"
+#include "Fireball.h"
 
 const float Player::JUMP_VELOCITY = -3.7f;
 const float Player::BONK_VELOCITY = 3.0f;
@@ -17,7 +18,9 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;
-    this->objectsList = objectsManager->getObjectList();
+    objectsList = objectsManager->getObjectList();
+
+    fireballRenderer = renderer;
 
     velocity.x = 0;
     velocity.y = 0;
@@ -438,6 +441,8 @@ void Player::attemptFireballThrow() {
         return;
     }
 
+    SDL_FPoint fireballSpawnPosition = {position.x, position.y};//TODO
+    objectsManager->add(new Fireball(fireballRenderer, currentLevel, &fireballSpawnPosition, objectsManager, facingRight));
     throwFireballFramesLeft = THROW_FIREBALL_FRAME_COUNT;
 }
 

@@ -9,7 +9,8 @@ CPP_FILES = \
 	Input.cpp \
 	Animator.cpp \
 	Time.cpp \
-	Goomba.cpp
+	Goomba.cpp \
+	Fireball.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \
