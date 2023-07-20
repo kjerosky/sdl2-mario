@@ -33,6 +33,7 @@ private:
     const static float STOMP_REACTION_VELOCITY;
     const static int SPRITE_WIDTH;
     const static int THROW_FIREBALL_FRAME_COUNT;
+    const static int INVINCIBILITY_FRAMES_COUNT;
 
     enum PlayerState {
         ON_GROUND,
@@ -59,6 +60,7 @@ private:
     void centerCameraOnPlayer(SDL_Point* cameraPosition);
     void attemptFireballThrow();
 
+    void takeDamage();
     void powerUp();
     void powerDown();
 
@@ -116,6 +118,8 @@ private:
 
     GameObjectsManager* objectsManager;
     std::vector<GameObject*>* objectsList;
+
+    int invincibilityFramesLeft;
 };
 
 #endif

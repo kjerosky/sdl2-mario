@@ -13,6 +13,7 @@ const float Player::FALL_GRAVITY = 0.3f;
 const float Player::STOMP_REACTION_VELOCITY = -3.0f;
 const int Player::SPRITE_WIDTH = 16;
 const int Player::THROW_FIREBALL_FRAME_COUNT = 7;
+const int Player::INVINCIBILITY_FRAMES_COUNT = 180;
 
 Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
     this->position = *position;
@@ -142,6 +143,8 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
     throwFireballFramesLeft = 0;
 
     input = Input::getInstance();
+
+    invincibilityFramesLeft = 0;
 }
 
 Player::~Player() {
@@ -191,7 +194,7 @@ GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject)
                 response = GET_STOMPED;
             } else {
                 response = NO_PROBLEM;
-                std::cout << "Player taking damage from enemy!" << std::endl;
+                takeDamage();
             }
             break;
         default:
@@ -254,6 +257,10 @@ void Player::processCurrentState() {
             attemptFireballThrow();
             break;
     }
+
+    if (invincibilityFramesLeft > 0) {
+        invincibilityFramesLeft--;
+    }
 }
 
 void Player::updateGroundStatus() {
@@ -266,6 +273,7 @@ void Player::updateGroundStatus() {
         };
         if (currentLevel->isWorldPositionInForegroundTile(&testPoint) && velocity.y >= 0) {
             isGrounded = true;
+            velocity.y = 0;
             break;
         }
     }
@@ -364,8 +372,7 @@ void Player::resolveCollisions() {
                 velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
                 break;
             case TAKE_DAMAGE:
-                //TODO
-                std::cout << "player takes damage" << std::endl;
+                takeDamage();
                 break;
             default:
                 std::cerr << "[ERROR] Player received unknown collision response: " << collisionResponse << std::endl;
@@ -449,7 +456,22 @@ void Player::attemptFireballThrow() {
     throwFireballFramesLeft = THROW_FIREBALL_FRAME_COUNT;
 }
 
-void Player::powerUp() {
+void Player::takeDamage() {
+    if (invincibilityFramesLeft > 0) {
+        return;
+    }
+
+    if (powerState == SMALL_MARIO) {
+        //TODO
+        std::cerr << "mario died" << std::endl;
+    } else {
+        powerDown();
+        invincibilityFramesLeft = INVINCIBILITY_FRAMES_COUNT;
+    }
+}
+
+void Player::powerUp()
+{
     if (powerState == SMALL_MARIO) {
         position.y -= 16;
         currentSpriteHeight = 32;
@@ -485,5 +507,7 @@ void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
         position.y - cameraPosition->y
     };
 
-    currentAnimator->draw(renderer, &spritePosition, !facingRight, false);
+    if (invincibilityFramesLeft <= 0 || invincibilityFramesLeft % 2 == 0) {
+        currentAnimator->draw(renderer, &spritePosition, !facingRight, false);
+    }
 }
