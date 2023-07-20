@@ -41,7 +41,7 @@ bool Animator::update() {
     return animationCompleted;
 }
 
-void Animator::draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally) {
+void Animator::draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally, bool flipVertically) {
     SDL_Rect sourceRectangle = {
         frameIndices[currentFrameIndex] * spriteWidth,
         0,
@@ -56,6 +56,10 @@ void Animator::draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizo
         spriteHeight
     };
 
+    int horizontalFlipping = flipHorizontally ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+    int verticalFlipping = flipVertically ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+    SDL_RendererFlip flipping = (SDL_RendererFlip)(horizontalFlipping | verticalFlipping);
+
     SDL_RenderCopyEx(
         renderer,
         spriteSheet,
@@ -63,5 +67,5 @@ void Animator::draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizo
         &destinationRectangle,
         0,
         NULL,
-        flipHorizontally ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+        flipping);
 }

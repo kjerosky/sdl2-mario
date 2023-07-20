@@ -12,7 +12,7 @@ public:
 
     void reset();
     bool update();
-    void draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally);
+    void draw(SDL_Renderer* renderer, SDL_Point* position, bool flipHorizontally, bool flipVertically);
 
 private:
 

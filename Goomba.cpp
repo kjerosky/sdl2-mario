@@ -4,6 +4,7 @@
 #include <SDL_image.h>
 
 #include "Time.h"
+#include "GameConfig.h"
 
 const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
@@ -50,6 +51,10 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
     int stompedFramesCount = sizeof(stompedFrames) / sizeof(int);
     stompedAnimator = new Animator(spriteSheet, 16, 16, 60, stompedFrames, stompedFramesCount);
 
+    int hitByFireballFrames[] = {0};
+    int hitByFireballFramesCount = sizeof(hitByFireballFrames) / sizeof(int);
+    hitByFireballAnimator = new Animator(spriteSheet, 16, 16, 1, hitByFireballFrames, hitByFireballFramesCount);
+
     currentAnimator = walkingAnimator;
 
     state = WALKING;
@@ -94,10 +99,17 @@ GameObject::CollisionResponse Goomba::receiveCollision(GameObject* sourceObject)
                 response = TAKE_DAMAGE;
             }
         } break;
+
         case ENEMY: {
             velocity.x = -velocity.x;
             response = REVERSE_COURSE;
         } break;
+
+        case FIREBALL: {
+            takeDamage();
+            response = TAKE_DAMAGE;
+        } break;
+
         default: {
             response = NO_PROBLEM;
         } break;
@@ -117,12 +129,23 @@ void Goomba::checkStateTransitions() {
         case WALKING:
             // nothing to do - transition is handled through collisions
             break;
+
         case STOMPED:
             // nothing to do - transition is set by the animator
             break;
+
+        case HIT_BY_FIREBALL:
+            // nothing to do - will transition out when offscreen
+            break;
+
         case DEAD:
             // nothing to do
             break;
+    }
+
+    // account for pits and being hit by a fireball
+    if (position.y > GameConfig::getInstance()->getRenderHeight()) {
+        state = DEAD;
     }
 }
 
@@ -133,9 +156,15 @@ void Goomba::processCurrentState() {
             applyVerticalMovement();
             resolveCollisions();
             break;
+
         case STOMPED:
             applyVerticalMovement();
             break;
+
+        case HIT_BY_FIREBALL:
+            applyHitByFireballMovement();
+            break;
+
         case DEAD:
             objectsManager->destroy(this);
             break;
@@ -221,8 +250,7 @@ void Goomba::resolveCollisions() {
                 state = STOMPED;
                 break;
             case TAKE_DAMAGE:
-                //TODO
-                std::cout << "Goomba takes damage" << std::endl;
+                takeDamage();
                 break;
             default:
                 std::cerr << "[ERROR] Goomba received unknown collision response: " << collisionResponse << std::endl;
@@ -236,6 +264,8 @@ void Goomba::animateSprite() {
 
     if (state == STOMPED) {
         currentAnimator = stompedAnimator;
+    } else if (state == HIT_BY_FIREBALL) {
+        currentAnimator = hitByFireballAnimator;
     }
 
     if (previousAnimator != currentAnimator) {
@@ -248,6 +278,19 @@ void Goomba::animateSprite() {
     }
 }
 
+void Goomba::takeDamage() {
+    velocity.x = 1.0f;
+    velocity.y = -2.5f;
+    state = HIT_BY_FIREBALL;
+}
+
+void Goomba::applyHitByFireballMovement() {
+    position.x += velocity.x;
+
+    velocity.y += 0.2f;
+    position.y += velocity.y;
+}
+
 void Goomba::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     if (state == DEAD) {
         return;
@@ -258,5 +301,9 @@ void Goomba::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
         position.y - cameraPosition->y
     };
 
-    currentAnimator->draw(renderer, &spritePosition, false);
+    if (state == HIT_BY_FIREBALL) {
+        currentAnimator->draw(renderer, &spritePosition, false, true);
+    } else {
+        currentAnimator->draw(renderer, &spritePosition, false, false);
+    }
 }

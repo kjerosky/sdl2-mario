@@ -69,8 +69,23 @@ bool Fireball::isStompable() {
 }
 
 GameObject::CollisionResponse Fireball::receiveCollision(GameObject* sourceObject) {
-    //TODO
-    return NO_PROBLEM;
+    if (exploding) {
+        return NO_PROBLEM;
+    }
+
+    GameObject::CollisionResponse response;
+    switch (sourceObject->getType()) {
+        case ENEMY: {
+            beginExploding();
+            response = TAKE_DAMAGE;
+        } break;
+
+        default: {
+            response = NO_PROBLEM;
+        }
+    }
+
+    return response;
 }
 
 void Fireball::update(SDL_Point *cameraPosition) {
@@ -82,9 +97,12 @@ void Fireball::update(SDL_Point *cameraPosition) {
     //     applyVerticalMovement();
     // }
 
+    if (!exploding) {
+        resolveCollisions();
+    }
+
     if (previouslyExploding != exploding) {
-        position.y -= 4;
-        currentAnimator = explodingAnimator;
+        beginExploding();
     }
 
     bool animationComplete = currentAnimator->update();
@@ -107,11 +125,50 @@ void Fireball::applyHorizontalMovement() {
     }
 }
 
+void Fireball::resolveCollisions() {
+    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
+        if (*currentObject == this) {
+            continue;
+        }
+
+        SDL_Rect myWorldHitBox = *getHitBox();
+        myWorldHitBox.x += position.x;
+        myWorldHitBox.y += position.y;
+        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
+        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
+        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
+        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
+            continue;
+        }
+
+        GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
+        switch (collisionResponse) {
+            case NO_PROBLEM:
+                // no need to react
+                break;
+
+            case TAKE_DAMAGE:
+                beginExploding();
+                break;
+
+            default:
+                std::cerr << "[ERROR] Fireball received unknown collision response: " << collisionResponse << std::endl;
+                break;
+        }
+    }
+}
+
+void Fireball::beginExploding() {
+    exploding = true;
+    position.y -= 4;
+    currentAnimator = explodingAnimator;
+}
+
 void Fireball::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     SDL_Point spritePosition = {
         position.x - cameraPosition->x,
         position.y - cameraPosition->y
     };
 
-    currentAnimator->draw(renderer, &spritePosition, !facingRight);
+    currentAnimator->draw(renderer, &spritePosition, !facingRight, false);
 }

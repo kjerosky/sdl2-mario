@@ -32,7 +32,8 @@ private:
     enum GoombaState {
         WALKING,
         STOMPED,
-        DEAD
+        HIT_BY_FIREBALL,
+        DEAD,
     };
     GoombaState state;
 
@@ -43,10 +44,13 @@ private:
     void applyVerticalMovement();
     void resolveCollisions();
     void animateSprite();
+    void takeDamage();
+    void applyHitByFireballMovement();
 
     SDL_Texture* spriteSheet;
     Animator* walkingAnimator;
     Animator* stompedAnimator;
+    Animator* hitByFireballAnimator;
 
     Animator* currentAnimator;
 

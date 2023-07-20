@@ -30,6 +30,8 @@ private:
     const static int MOVING_SPRITE_WIDTH;
 
     void applyHorizontalMovement();
+    void resolveCollisions();
+    void beginExploding();
 
     Level* currentLevel;
     GameObjectsManager* objectsManager;

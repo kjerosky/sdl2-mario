@@ -441,7 +441,10 @@ void Player::attemptFireballThrow() {
         return;
     }
 
-    SDL_FPoint fireballSpawnPosition = {position.x, position.y};//TODO
+    SDL_FPoint fireballSpawnPosition = {
+        facingRight ? position.x + 8 : position.x,
+        position.y
+    };
     objectsManager->add(new Fireball(fireballRenderer, currentLevel, &fireballSpawnPosition, objectsManager, facingRight));
     throwFireballFramesLeft = THROW_FIREBALL_FRAME_COUNT;
 }
@@ -482,5 +485,5 @@ void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
         position.y - cameraPosition->y
     };
 
-    currentAnimator->draw(renderer, &spritePosition, !facingRight);
+    currentAnimator->draw(renderer, &spritePosition, !facingRight, false);
 }
