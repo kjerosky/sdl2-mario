@@ -31,6 +31,8 @@ private:
     const static float HORIZONTAL_VELOCITY;
     const static float GRAVITY;
     const static Uint64 STOMPED_FRAMES;
+    const static float TAKING_DAMAGE_HORIZONTAL_VELOCITY;
+    const static float TAKING_DAMAGE_VERTICAL_VELOCITY;
 
     enum GoombaState {
         WALKING,
@@ -47,7 +49,7 @@ private:
     void applyVerticalMovement();
     void resolveCollisions();
     void animateSprite();
-    void takeDamage();
+    void takeDamage(bool fallRight);
     void applyHitByFireballMovement();
 
     SpriteSheet* spriteSheet;

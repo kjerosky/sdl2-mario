@@ -9,6 +9,8 @@
 const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
 const Uint64 Goomba::STOMPED_FRAMES = 30;
+const float TAKING_DAMAGE_INITIAL_HORIZONTAL_VELOCITY = 1.0f;
+const float TAKING_DAMAGE_INITIAL_VERTICAL_VELOCITY = -2.5f;
 
 Goomba::Goomba(Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager) {
     this->position = *position;
@@ -105,7 +107,7 @@ CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
         } break;
 
         case FIREBALL: {
-            takeDamage();
+            takeDamage(sourceObject->getVelocity()->x >= 0);
             response = TAKE_DAMAGE;
         } break;
 
@@ -244,7 +246,7 @@ void Goomba::resolveCollisions() {
                 state = STOMPED;
                 break;
             case TAKE_DAMAGE:
-                takeDamage();
+                takeDamage((*currentObject)->getVelocity()->x >= 0);
                 break;
             default:
                 std::cerr << "[ERROR] Goomba received unknown collision response: " << collisionResponse << std::endl;
@@ -272,9 +274,9 @@ void Goomba::animateSprite() {
     }
 }
 
-void Goomba::takeDamage() {
-    velocity.x = 1.0f;
-    velocity.y = -2.5f;
+void Goomba::takeDamage(bool fallRight) {
+    velocity.x = fallRight ? TAKING_DAMAGE_INITIAL_HORIZONTAL_VELOCITY : -TAKING_DAMAGE_INITIAL_HORIZONTAL_VELOCITY;
+    velocity.y = TAKING_DAMAGE_INITIAL_VERTICAL_VELOCITY;
     state = HIT_BY_FIREBALL;
 }
 
