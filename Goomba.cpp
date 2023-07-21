@@ -4,6 +4,7 @@
 
 #include "Time.h"
 #include "GameConfig.h"
+#include "SpriteSheetRepository.h"
 
 const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
@@ -37,7 +38,7 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
     hitBox.w = 10;
     hitBox.h = 10;
 
-    spriteSheet = new SpriteSheet("assets/goomba.png", 16, 16, renderer);
+    spriteSheet = SpriteSheetRepository::getInstance()->getSpriteSheetById(GOOMBA_SHEET);
 
     int walkingFrames[] = {0, 1};
     int walkingFramesCount = sizeof(walkingFrames) / sizeof(int);
@@ -57,8 +58,6 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
 }
 
 Goomba::~Goomba() {
-    delete spriteSheet;
-
     delete walkingAnimator;
     delete stompedAnimator;
 

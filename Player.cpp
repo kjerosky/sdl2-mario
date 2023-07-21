@@ -4,6 +4,7 @@
 
 #include "GameConfig.h"
 #include "Fireball.h"
+#include "SpriteSheetRepository.h"
 
 const float Player::JUMP_VELOCITY = -3.7f;
 const float Player::BONK_VELOCITY = 3.0f;
@@ -78,9 +79,10 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 
     currentHitBox = &smallMarioHitBox;
 
-    smallMarioSpriteSheet = new SpriteSheet("assets/small-mario.png", 16, 16, renderer);
-    superMarioSpriteSheet = new SpriteSheet("assets/super-mario.png", 16, 32, renderer);
-    fireMarioSpriteSheet = new SpriteSheet("assets/fire-mario.png", 16, 32, renderer);
+    SpriteSheetRepository* spriteSheetRepository = SpriteSheetRepository::getInstance();
+    smallMarioSpriteSheet = spriteSheetRepository->getSpriteSheetById(SMALL_MARIO_SHEET);
+    superMarioSpriteSheet = spriteSheetRepository->getSpriteSheetById(SUPER_MARIO_SHEET);
+    fireMarioSpriteSheet = spriteSheetRepository->getSpriteSheetById(FIRE_MARIO_SHEET);
 
     int smallMarioStandingFrames[] = {0};
     int smallMarioStandingFramesCount = sizeof(smallMarioStandingFrames) / sizeof(int);
@@ -136,10 +138,6 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 }
 
 Player::~Player() {
-    delete smallMarioSpriteSheet;
-    delete superMarioSpriteSheet;
-    delete fireMarioSpriteSheet;
-
     delete[] smallSizeDownCollisionChecks;
     delete[] smallSizeRightCollisionChecks;
 

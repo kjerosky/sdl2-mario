@@ -11,7 +11,8 @@ CPP_FILES = \
 	Time.cpp \
 	Goomba.cpp \
 	Fireball.cpp \
-	SpriteSheet.cpp
+	SpriteSheet.cpp \
+	SpriteSheetRepository.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

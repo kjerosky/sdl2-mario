@@ -9,6 +9,7 @@
 #include "Goomba.h"
 #include "Input.h"
 #include "Time.h"
+#include "SpriteSheetRepository.h"
 
 int main(int argc, char *argv[]) {
 
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]) {
     int imgInitFlags = IMG_INIT_PNG;
     if ((IMG_Init(imgInitFlags) & imgInitFlags) != imgInitFlags) {
         std::cerr << "IMG_Init Error: " << IMG_GetError() << std::endl;
+        SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
@@ -62,7 +64,16 @@ int main(int argc, char *argv[]) {
     );
     if (!renderTexture) {
         std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << std::endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
         return 1;
+    }
+
+    SpriteSheetRepository* spriteSheetRepository = SpriteSheetRepository::getInstance();
+    if (!spriteSheetRepository->initialize(renderer)) {
+        SDL_DestroyTexture(renderTexture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
     }
 
     Level *level = new Level(renderer, "assets/test-level-tiles.png");
@@ -130,6 +141,7 @@ int main(int argc, char *argv[]) {
 
     delete level;
 
+    spriteSheetRepository->cleanup();
     SDL_DestroyTexture(renderTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "SpriteSheetRepository.h"
+
 const float Fireball::HORIZONTAL_VELOCITY = 4.0f;
 const float Fireball::MAX_VERTICAL_VELOCITY = 4.0f;
 const float Fireball::GRAVITY = 0.5f;
@@ -17,7 +19,7 @@ Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *posi
     velocity.x = facingRight ? HORIZONTAL_VELOCITY : -HORIZONTAL_VELOCITY;
     velocity.y = MAX_VERTICAL_VELOCITY;
 
-    spriteSheet = new SpriteSheet("assets/fireball.png", 16, 16, renderer);
+    spriteSheet = SpriteSheetRepository::getInstance()->getSpriteSheetById(FIREBALL_SHEET);
 
     int movingFrames[] = {0, 1, 2, 3};
     int movingFramesCount = sizeof(movingFrames) / sizeof(int);
@@ -41,8 +43,6 @@ Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *posi
 }
 
 Fireball::~Fireball() {
-    delete spriteSheet;
-
     delete movingAnimator;
     delete explodingAnimator;
 }
