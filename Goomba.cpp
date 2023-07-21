@@ -10,7 +10,7 @@ const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
 const Uint64 Goomba::STOMPED_FRAMES = 30;
 
-Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager) {
+Goomba::Goomba(Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager) {
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;

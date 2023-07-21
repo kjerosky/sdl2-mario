@@ -15,13 +15,13 @@ const int Player::SPRITE_WIDTH = 16;
 const int Player::THROW_FIREBALL_FRAME_COUNT = 7;
 const int Player::INVINCIBILITY_FRAMES_COUNT = 180;
 
-Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
+Player::Player(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;
     objectsList = objectsManager->getObjectList();
 
-    fireballRenderer = renderer;
+    enabled = true;
 
     velocity.x = 0;
     velocity.y = 0;
@@ -463,7 +463,7 @@ void Player::attemptFireballThrow() {
         position.y + 8
     };
 
-    Fireball* fireball = new Fireball(fireballRenderer, currentLevel, &fireballSpawnPosition, objectsManager, facingRight);
+    Fireball* fireball = new Fireball(currentLevel, &fireballSpawnPosition, objectsManager, facingRight);
     fireball->enable();
     objectsManager->add(fireball);
 

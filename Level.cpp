@@ -5,8 +5,9 @@
 #include <cmath>
 
 #include "GameConfig.h"
+#include "SpriteSheetRepository.h"
 
-Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
+Level::Level() {
     static int staticTileData[] = {
         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -30,7 +31,7 @@ Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
 
     tileHorizontalPixels = 16;
     tileVerticalPixels = 16;
-    levelTiles = new SpriteSheet(levelTilesFilename, tileHorizontalPixels, tileVerticalPixels, renderer);
+    levelTiles = SpriteSheetRepository::getInstance()->getSpriteSheetById(TEST_LEVEL_TILES_SHEET);
 
     backgroundTileIds.insert(0);
     backgroundTileIds.insert(2);
@@ -45,7 +46,6 @@ Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
 
 Level::~Level() {
     delete[] tileData;
-    delete levelTiles;
 }
 
 void Level::clearWithBackgroundColor(SDL_Renderer *renderer) {

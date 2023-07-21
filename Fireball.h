@@ -14,7 +14,7 @@ class Fireball : public GameObject {
 
 public:
 
-    Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager, bool facingRight);
+    Fireball(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager, bool facingRight);
     ~Fireball();
 
     GameObject::Type getType();

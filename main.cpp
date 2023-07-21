@@ -76,26 +76,25 @@ int main(int argc, char *argv[]) {
         SDL_DestroyWindow(window);
     }
 
-    Level *level = new Level(renderer, "assets/test-level-tiles.png");
+    Level *level = new Level();
     SDL_Point worldCameraPosition = {0, 0};
 
     GameObjectsManager objectsManager;
 
     SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
-    Player* player = new Player(renderer, level, &initialPlayerPosition, &objectsManager);
-    player->enable();
+    Player* player = new Player(level, &initialPlayerPosition, &objectsManager);
     objectsManager.add(player);
 
     SDL_FPoint initialGoombaPosition = {10 * 16, 0 * 16};
-    objectsManager.add(new Goomba(renderer, level, &initialGoombaPosition, &objectsManager));
+    objectsManager.add(new Goomba(level, &initialGoombaPosition, &objectsManager));
 
     SDL_FPoint initialGoombaPosition2 = {9 * 16, 9 * 16};
-    objectsManager.add(new Goomba(renderer, level, &initialGoombaPosition2, &objectsManager));
+    objectsManager.add(new Goomba(level, &initialGoombaPosition2, &objectsManager));
     SDL_FPoint initialGoombaPosition3 = {10 * 16, 9 * 16};
-    objectsManager.add(new Goomba(renderer, level, &initialGoombaPosition3, &objectsManager));
+    objectsManager.add(new Goomba(level, &initialGoombaPosition3, &objectsManager));
 
     SDL_FPoint initialOffscreenGoombaPosition = {27 * 16, 9 * 16};
-    objectsManager.add(new Goomba(renderer, level, &initialOffscreenGoombaPosition, &objectsManager));
+    objectsManager.add(new Goomba(level, &initialOffscreenGoombaPosition, &objectsManager));
 
     Time::initialize(60);
     Input* input = Input::getInstance();

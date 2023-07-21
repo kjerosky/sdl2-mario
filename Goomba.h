@@ -14,7 +14,7 @@ class Goomba : public GameObject {
 
 public:
 
-    Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager);
+    Goomba(Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager);
     ~Goomba();
 
     GameObject::Type getType();

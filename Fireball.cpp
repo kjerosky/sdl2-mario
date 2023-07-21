@@ -9,7 +9,7 @@ const float Fireball::MAX_VERTICAL_VELOCITY = 4.0f;
 const float Fireball::GRAVITY = 0.5f;
 const int Fireball::MOVING_SPRITE_WIDTH = 8;
 
-Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager *objectsManager, bool facingRight) {
+Fireball::Fireball(Level *currentLevel, SDL_FPoint *position, GameObjectsManager *objectsManager, bool facingRight) {
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;

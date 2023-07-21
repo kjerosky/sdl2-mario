@@ -10,7 +10,7 @@ class Level {
 
 public:
 
-    Level(SDL_Renderer *renderer, const char *levelTilesFilename);
+    Level();
     ~Level();
 
     void constrainCameraToLevel(SDL_Point *cameraPosition);
