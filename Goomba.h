@@ -8,6 +8,7 @@
 #include "Level.h"
 #include "Animator.h"
 #include "GameObjectsManager.h"
+#include "SpriteSheet.h"
 
 class Goomba : public GameObject {
 
@@ -48,7 +49,7 @@ private:
     void takeDamage();
     void applyHitByFireballMovement();
 
-    SDL_Texture* spriteSheet;
+    SpriteSheet* spriteSheet;
     Animator* walkingAnimator;
     Animator* stompedAnimator;
     Animator* hitByFireballAnimator;

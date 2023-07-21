@@ -1,6 +1,5 @@
 #include "Fireball.h"
 
-#include <SDL_image.h>
 #include <iostream>
 
 const float Fireball::HORIZONTAL_VELOCITY = 4.0f;
@@ -18,18 +17,15 @@ Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *posi
     velocity.x = facingRight ? HORIZONTAL_VELOCITY : -HORIZONTAL_VELOCITY;
     velocity.y = MAX_VERTICAL_VELOCITY;
 
-    spriteSheet = IMG_LoadTexture(renderer, "assets/fireball.png");
-    if (!spriteSheet) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-    }
+    spriteSheet = new SpriteSheet("assets/fireball.png", 16, 16, renderer);
 
     int movingFrames[] = {0, 1, 2, 3};
     int movingFramesCount = sizeof(movingFrames) / sizeof(int);
-    movingAnimator = new Animator(spriteSheet, 16, 16, 4, movingFrames, movingFramesCount);
+    movingAnimator = new Animator(spriteSheet, 4, movingFrames, movingFramesCount);
 
     int explodingFrames[] = {4, 5, 6};
     int explodingFramesCount = sizeof(explodingFrames) / sizeof(int);
-    explodingAnimator = new Animator(spriteSheet, 16, 16, 2, explodingFrames, explodingFramesCount);
+    explodingAnimator = new Animator(spriteSheet, 2, explodingFrames, explodingFramesCount);
 
     currentAnimator = movingAnimator;
 
@@ -45,7 +41,7 @@ Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *posi
 }
 
 Fireball::~Fireball() {
-    SDL_DestroyTexture(spriteSheet);
+    delete spriteSheet;
 
     delete movingAnimator;
     delete explodingAnimator;

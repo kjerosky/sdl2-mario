@@ -1,6 +1,5 @@
 #include "Player.h"
 
-#include <SDL_image.h>
 #include <iostream>
 
 #include "GameConfig.h"
@@ -79,60 +78,49 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 
     currentHitBox = &smallMarioHitBox;
 
-    smallMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/small-mario.png");
-    if (!smallMarioSpriteSheet) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-    }
-
-    superMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/super-mario.png");
-    if (!superMarioSpriteSheet) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-    }
-
-    fireMarioSpriteSheet = IMG_LoadTexture(renderer, "assets/fire-mario.png");
-    if (!fireMarioSpriteSheet) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-    }
+    smallMarioSpriteSheet = new SpriteSheet("assets/small-mario.png", 16, 16, renderer);
+    superMarioSpriteSheet = new SpriteSheet("assets/super-mario.png", 16, 32, renderer);
+    fireMarioSpriteSheet = new SpriteSheet("assets/fire-mario.png", 16, 32, renderer);
 
     int smallMarioStandingFrames[] = {0};
     int smallMarioStandingFramesCount = sizeof(smallMarioStandingFrames) / sizeof(int);
-    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 1, smallMarioStandingFrames, smallMarioStandingFramesCount);
+    smallMarioStandingAnimator = new Animator(smallMarioSpriteSheet, 1, smallMarioStandingFrames, smallMarioStandingFramesCount);
 
     int smallMarioWalkingFrames[] = {1, 2, 3, 2};
     int smallMarioWalkingFramesCount = sizeof(smallMarioWalkingFrames) / sizeof(int);
-    smallMarioWalkingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 6, smallMarioWalkingFrames, smallMarioWalkingFramesCount);
+    smallMarioWalkingAnimator = new Animator(smallMarioSpriteSheet, 6, smallMarioWalkingFrames, smallMarioWalkingFramesCount);
 
     int smallMarioJumpingFrames[] = {5};
     int smallMarioJumpingFramesCount = sizeof(smallMarioJumpingFrames) / sizeof(int);
-    smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 16, 16, 1, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
+    smallMarioJumpingAnimator = new Animator(smallMarioSpriteSheet, 1, smallMarioJumpingFrames, smallMarioJumpingFramesCount);
 
     int superMarioStandingFrames[] = {0};
     int superMarioStandingFramesCount = sizeof(superMarioStandingFrames) / sizeof(int);
-    superMarioStandingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 1, superMarioStandingFrames, superMarioStandingFramesCount);
+    superMarioStandingAnimator = new Animator(superMarioSpriteSheet, 1, superMarioStandingFrames, superMarioStandingFramesCount);
 
     int superMarioWalkingFrames[] = {3, 1, 2};
     int superMarioWalkingFramesCount = sizeof(superMarioWalkingFrames) / sizeof(int);
-    superMarioWalkingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 6, superMarioWalkingFrames, superMarioWalkingFramesCount);
+    superMarioWalkingAnimator = new Animator(superMarioSpriteSheet, 6, superMarioWalkingFrames, superMarioWalkingFramesCount);
 
     int superMarioJumpingFrames[] = {5};
     int superMarioJumpingFramesCount = sizeof(superMarioJumpingFrames) / sizeof(int);
-    superMarioJumpingAnimator = new Animator(superMarioSpriteSheet, 16, 32, 1, superMarioJumpingFrames, superMarioJumpingFramesCount);
+    superMarioJumpingAnimator = new Animator(superMarioSpriteSheet, 1, superMarioJumpingFrames, superMarioJumpingFramesCount);
 
     int fireMarioStandingFrames[] = {0};
     int fireMarioStandingFramesCount = sizeof(fireMarioStandingFrames) / sizeof(int);
-    fireMarioStandingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1, fireMarioStandingFrames, fireMarioStandingFramesCount);
+    fireMarioStandingAnimator = new Animator(fireMarioSpriteSheet, 1, fireMarioStandingFrames, fireMarioStandingFramesCount);
 
     int fireMarioWalkingFrames[] = {3, 1, 2};
     int fireMarioWalkingFramesCount = sizeof(fireMarioWalkingFrames) / sizeof(int);
-    fireMarioWalkingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 6, fireMarioWalkingFrames, fireMarioWalkingFramesCount);
+    fireMarioWalkingAnimator = new Animator(fireMarioSpriteSheet, 6, fireMarioWalkingFrames, fireMarioWalkingFramesCount);
 
     int fireMarioJumpingFrames[] = {5};
     int fireMarioJumpingFramesCount = sizeof(fireMarioJumpingFrames) / sizeof(int);
-    fireMarioJumpingAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1, fireMarioJumpingFrames, fireMarioJumpingFramesCount);
+    fireMarioJumpingAnimator = new Animator(fireMarioSpriteSheet, 1, fireMarioJumpingFrames, fireMarioJumpingFramesCount);
 
     int fireMarioThrowingFireballFrames[] = {15};
     int fireMarioThrowingFireballCount = sizeof(fireMarioThrowingFireballFrames) / sizeof(int);
-    fireMarioThrowingFireballAnimator = new Animator(fireMarioSpriteSheet, 16, 32, 1, fireMarioThrowingFireballFrames, fireMarioThrowingFireballCount);
+    fireMarioThrowingFireballAnimator = new Animator(fireMarioSpriteSheet, 1, fireMarioThrowingFireballFrames, fireMarioThrowingFireballCount);
 
     powerState = SMALL_MARIO;
     currentAnimator = smallMarioStandingAnimator;
@@ -148,9 +136,9 @@ Player::Player(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position
 }
 
 Player::~Player() {
-    SDL_DestroyTexture(smallMarioSpriteSheet);
-    SDL_DestroyTexture(superMarioSpriteSheet);
-    SDL_DestroyTexture(fireMarioSpriteSheet);
+    delete smallMarioSpriteSheet;
+    delete superMarioSpriteSheet;
+    delete fireMarioSpriteSheet;
 
     delete[] smallSizeDownCollisionChecks;
     delete[] smallSizeRightCollisionChecks;

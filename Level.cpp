@@ -1,6 +1,5 @@
 #include "Level.h"
 
-#include <SDL_image.h>
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -29,18 +28,14 @@ Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
     horizontalTileCount = 40;
     verticalTileCount = 12;
 
-    levelTiles = IMG_LoadTexture(renderer, levelTilesFilename);
-    if (!levelTiles) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-    }
+    tileHorizontalPixels = 16;
+    tileVerticalPixels = 16;
+    levelTiles = new SpriteSheet(levelTilesFilename, tileHorizontalPixels, tileVerticalPixels, renderer);
 
     backgroundTileIds.insert(0);
     backgroundTileIds.insert(2);
 
     foregroundTileIds.insert(1);
-
-    tileHorizontalPixels = 16;
-    tileVerticalPixels = 16;
 
     backgroundColor.r = 49;
     backgroundColor.g = 171;
@@ -50,7 +45,7 @@ Level::Level(SDL_Renderer *renderer, const char *levelTilesFilename) {
 
 Level::~Level() {
     delete[] tileData;
-    SDL_DestroyTexture(levelTiles);
+    delete levelTiles;
 }
 
 void Level::clearWithBackgroundColor(SDL_Renderer *renderer) {
@@ -85,7 +80,6 @@ void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition, std::
     int topMostTileY = std::max(worldCameraPosition->y / tileVerticalPixels, 0);
     int bottomMostTileY = std::min(topMostTileY + visibleVerticalTiles, verticalTileCount - 1);
 
-    SDL_Rect sourceRect = {0, 0, tileHorizontalPixels, tileVerticalPixels};
     for (int y = topMostTileY; y <= bottomMostTileY; y++) {
         for (int x = leftMostTileX; x <= rightMostTileX; x++) {
             int tileDataIndex = y * horizontalTileCount + x;
@@ -98,16 +92,12 @@ void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition, std::
                 continue;
             }
 
-            sourceRect.x = tileId * tileHorizontalPixels;
-
-            SDL_Rect destinationRect = {
+            SDL_Point position = {
                 x * tileHorizontalPixels - worldCameraPosition->x,
                 y * tileVerticalPixels - worldCameraPosition->y,
-                tileHorizontalPixels,
-                tileVerticalPixels
             };
 
-            SDL_RenderCopy(renderer, levelTiles, &sourceRect, &destinationRect);
+            levelTiles->drawSprite(renderer, tileId, &position);
         }
     }
 }

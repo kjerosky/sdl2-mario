@@ -3,11 +3,13 @@
 
 #include <SDL.h>
 
+#include "SpriteSheet.h"
+
 class Animator {
 
 public:
 
-    Animator(SDL_Texture* spriteSheet, int spriteWidth, int spriteHeight, int framesPerAnimationFrame, int *frameIndices, int frameIndicesCount);
+    Animator(SpriteSheet* TESTspriteSheet, int framesPerAnimationFrame, int *frameIndices, int frameIndicesCount);
     ~Animator();
 
     void reset();
@@ -16,9 +18,7 @@ public:
 
 private:
 
-    SDL_Texture *spriteSheet;
-    int spriteWidth;
-    int spriteHeight;
+    SpriteSheet* spriteSheet;
 
     int *frameIndices;
     int frameIndicesCount;

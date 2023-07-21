@@ -1,7 +1,6 @@
 #include "Goomba.h"
 
 #include <iostream>
-#include <SDL_image.h>
 
 #include "Time.h"
 #include "GameConfig.h"
@@ -38,22 +37,19 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
     hitBox.w = 10;
     hitBox.h = 10;
 
-    spriteSheet = IMG_LoadTexture(renderer, "assets/goomba.png");
-    if (!spriteSheet) {
-        std::cerr << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-    }
+    spriteSheet = new SpriteSheet("assets/goomba.png", 16, 16, renderer);
 
     int walkingFrames[] = {0, 1};
     int walkingFramesCount = sizeof(walkingFrames) / sizeof(int);
-    walkingAnimator = new Animator(spriteSheet, 16, 16, 8, walkingFrames, walkingFramesCount);
+    walkingAnimator = new Animator(spriteSheet, 8, walkingFrames, walkingFramesCount);
 
     int stompedFrames[] = {2};
     int stompedFramesCount = sizeof(stompedFrames) / sizeof(int);
-    stompedAnimator = new Animator(spriteSheet, 16, 16, STOMPED_FRAMES, stompedFrames, stompedFramesCount);
+    stompedAnimator = new Animator(spriteSheet, STOMPED_FRAMES, stompedFrames, stompedFramesCount);
 
     int hitByFireballFrames[] = {0};
     int hitByFireballFramesCount = sizeof(hitByFireballFrames) / sizeof(int);
-    hitByFireballAnimator = new Animator(spriteSheet, 16, 16, 1, hitByFireballFrames, hitByFireballFramesCount);
+    hitByFireballAnimator = new Animator(spriteSheet, 1, hitByFireballFrames, hitByFireballFramesCount);
 
     currentAnimator = walkingAnimator;
 
@@ -61,7 +57,7 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
 }
 
 Goomba::~Goomba() {
-    SDL_DestroyTexture(spriteSheet);
+    delete spriteSheet;
 
     delete walkingAnimator;
     delete stompedAnimator;

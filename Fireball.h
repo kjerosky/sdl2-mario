@@ -8,6 +8,7 @@
 #include "Level.h"
 #include "GameObjectsManager.h"
 #include "Animator.h"
+#include "SpriteSheet.h"
 
 class Fireball : public GameObject {
 
@@ -41,7 +42,7 @@ private:
     std::vector<GameObject*>* objectsList;
     bool facingRight;
 
-    SDL_Texture* spriteSheet;
+    SpriteSheet* spriteSheet;
     Animator* movingAnimator;
     Animator* explodingAnimator;
     Animator* currentAnimator;

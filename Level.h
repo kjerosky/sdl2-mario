@@ -4,6 +4,8 @@
 #include <SDL.h>
 #include <set>
 
+#include "SpriteSheet.h"
+
 class Level {
 
 public:
@@ -25,7 +27,7 @@ private:
     int horizontalTileCount;
     int verticalTileCount;
 
-    SDL_Texture *levelTiles;
+    SpriteSheet* levelTiles;
     int tileHorizontalPixels;
     int tileVerticalPixels;
     SDL_Color backgroundColor;

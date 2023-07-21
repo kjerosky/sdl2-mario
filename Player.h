@@ -9,6 +9,7 @@
 #include "Animator.h"
 #include "Input.h"
 #include "GameObjectsManager.h"
+#include "SpriteSheet.h"
 
 class Player : public GameObject {
 
@@ -73,17 +74,17 @@ private:
     bool facingRight;
     bool isGrounded;
 
-    SDL_Texture* smallMarioSpriteSheet;
+    SpriteSheet* smallMarioSpriteSheet;
     Animator* smallMarioStandingAnimator;
     Animator* smallMarioWalkingAnimator;
     Animator* smallMarioJumpingAnimator;
 
-    SDL_Texture* superMarioSpriteSheet;
+    SpriteSheet* superMarioSpriteSheet;
     Animator* superMarioStandingAnimator;
     Animator* superMarioWalkingAnimator;
     Animator* superMarioJumpingAnimator;
 
-    SDL_Texture* fireMarioSpriteSheet;
+    SpriteSheet* fireMarioSpriteSheet;
     Animator* fireMarioStandingAnimator;
     Animator* fireMarioWalkingAnimator;
     Animator* fireMarioJumpingAnimator;
