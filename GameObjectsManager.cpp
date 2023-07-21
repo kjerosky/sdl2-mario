@@ -81,7 +81,7 @@ void GameObjectsManager::drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *c
 void GameObjectsManager::destroyNonPlayerObjectsOutsideOfLevel(Level* level) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         GameObject* theObject = *object;
-        if (theObject->getType() == GameObject::Type::PLAYER) {
+        if (theObject->getType() == PLAYER) {
             continue;
         }
 
@@ -98,7 +98,7 @@ void GameObjectsManager::destroyNonPlayerObjectsOutsideOfLevel(Level* level) {
 void GameObjectsManager::destroyNonPlayerObjectsBehindCamera(SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         GameObject* theObject = *object;
-        if (theObject->getType() == GameObject::Type::PLAYER) {
+        if (theObject->getType() == PLAYER) {
             continue;
         }
 

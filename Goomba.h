@@ -17,12 +17,12 @@ public:
     Goomba(Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager);
     ~Goomba();
 
-    GameObject::Type getType();
+    GameObjectType getType();
     SDL_Rect* getHitBox();
     bool isCollidable();
     bool isStompable();
     bool isDrawnOnTop();
-    GameObject::CollisionResponse receiveCollision(GameObject* sourceObject);
+    CollisionResponse receiveCollision(GameObject* sourceObject);
     void update(SDL_Point *cameraPosition);
     void draw(SDL_Renderer *renderer, SDL_Point *cameraPosition);
 

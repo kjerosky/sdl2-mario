@@ -47,7 +47,7 @@ Fireball::~Fireball() {
     delete explodingAnimator;
 }
 
-GameObject::Type Fireball::getType() {
+GameObjectType Fireball::getType() {
     return FIREBALL;
 }
 
@@ -67,8 +67,8 @@ bool Fireball::isDrawnOnTop() {
     return true;
 }
 
-GameObject::CollisionResponse Fireball::receiveCollision(GameObject* sourceObject) {
-    GameObject::CollisionResponse response;
+CollisionResponse Fireball::receiveCollision(GameObject* sourceObject) {
+    CollisionResponse response;
     switch (sourceObject->getType()) {
         case ENEMY: {
             beginExploding();
@@ -148,7 +148,7 @@ void Fireball::resolveCollisions() {
             continue;
         }
 
-        GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
+        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
         switch (collisionResponse) {
             case NO_PROBLEM:
                 // no need to react

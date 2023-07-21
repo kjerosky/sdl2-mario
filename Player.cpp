@@ -158,7 +158,7 @@ Player::~Player() {
     delete fireMarioThrowingFireballAnimator;
 }
 
-GameObject::Type Player::getType() {
+GameObjectType Player::getType() {
     return PLAYER;
 }
 
@@ -178,9 +178,9 @@ bool Player::isDrawnOnTop() {
     return true;
 }
 
-GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
-    GameObject::CollisionResponse response;
-    GameObject::Type sourceType = sourceObject->getType();
+CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
+    CollisionResponse response;
+    GameObjectType sourceType = sourceObject->getType();
     switch (sourceType) {
         case ENEMY:
             if (sourceObject->isStompable() && velocity.y > 0) {
@@ -359,7 +359,7 @@ void Player::resolveCollisions() {
             continue;
         }
 
-        GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
+        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
         switch (collisionResponse) {
             case NO_PROBLEM:
                 // no need to react

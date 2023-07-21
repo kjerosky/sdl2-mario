@@ -3,24 +3,28 @@
 
 #include <SDL.h>
 
+enum GameObjectType {
+    PLAYER,
+    ENEMY,
+    FIREBALL,
+    POWERUP
+};
+
+enum CollisionResponse {
+    NO_PROBLEM,
+    REVERSE_COURSE,
+    GET_STOMPED,
+    REACT_TO_STOMP,
+    TAKE_DAMAGE
+};
+
 class GameObject {
 
 public:
 
-    enum Type {
-        PLAYER,
-        ENEMY,
-        FIREBALL,
-        POWERUP
-    };
-
-    enum CollisionResponse {
-        NO_PROBLEM,
-        REVERSE_COURSE,
-        GET_STOMPED,
-        REACT_TO_STOMP,
-        TAKE_DAMAGE
-    };
+    GameObject() {
+        enabled = false;
+    }
 
     virtual ~GameObject() {
         // nothing to do here - just need a virtual destructor
@@ -31,12 +35,12 @@ public:
     bool isEnabled() { return enabled; }
     void enable() { enabled = true; }
 
-    virtual GameObject::Type getType() = 0;
+    virtual GameObjectType getType() = 0;
     virtual SDL_Rect* getHitBox() = 0;
     virtual bool isCollidable() = 0;
     virtual bool isStompable() = 0;
     virtual bool isDrawnOnTop() = 0;
-    virtual GameObject::CollisionResponse receiveCollision(GameObject* sourceObject) = 0;
+    virtual CollisionResponse receiveCollision(GameObject* sourceObject) = 0;
     virtual void update(SDL_Point *cameraPosition) = 0;
     virtual void draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) = 0;
 
@@ -44,7 +48,7 @@ protected:
 
     SDL_FPoint position;
     SDL_FPoint velocity;
-    bool enabled = false;
+    bool enabled;
 };
 
 #endif

@@ -65,7 +65,7 @@ Goomba::~Goomba() {
     delete[] leftCollisionChecks;
 }
 
-GameObject::Type Goomba::getType() {
+GameObjectType Goomba::getType() {
     return ENEMY;
 }
 
@@ -85,9 +85,9 @@ bool Goomba::isDrawnOnTop() {
     return state == HIT_BY_FIREBALL;
 }
 
-GameObject::CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
-    GameObject::CollisionResponse response = NO_PROBLEM;
-    GameObject::Type sourceType = sourceObject->getType();
+CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
+    CollisionResponse response = NO_PROBLEM;
+    GameObjectType sourceType = sourceObject->getType();
     switch (sourceType) {
         case PLAYER: {
             bool isPlayerFalling = sourceObject->getVelocity()->y > 0;
@@ -232,7 +232,7 @@ void Goomba::resolveCollisions() {
             continue;
         }
 
-        GameObject::CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
+        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
         switch (collisionResponse) {
             case NO_PROBLEM:
                 // no need to react
