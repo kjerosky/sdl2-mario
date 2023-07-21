@@ -27,9 +27,11 @@ private:
 
     const static float HORIZONTAL_VELOCITY;
     const static float MAX_VERTICAL_VELOCITY;
+    const static float GRAVITY;
     const static int MOVING_SPRITE_WIDTH;
 
     void applyHorizontalMovement();
+    void applyVerticalMovement();
     void resolveCollisions();
     void beginExploding();
 
@@ -44,9 +46,7 @@ private:
     Animator* currentAnimator;
 
     SDL_Rect hitbox;
-
-    SDL_Point* collisionPoints;
-    int collisionPointsCount;
+    SDL_Point collisionPoint;
 
     bool exploding;
 };

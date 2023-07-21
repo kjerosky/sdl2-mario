@@ -5,6 +5,7 @@
 
 const float Fireball::HORIZONTAL_VELOCITY = 4.0f;
 const float Fireball::MAX_VERTICAL_VELOCITY = 4.0f;
+const float Fireball::GRAVITY = 0.5f;
 const int Fireball::MOVING_SPRITE_WIDTH = 8;
 
 Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *position, GameObjectsManager *objectsManager, bool facingRight) {
@@ -37,12 +38,8 @@ Fireball::Fireball(SDL_Renderer *renderer, Level *currentLevel, SDL_FPoint *posi
     hitbox.w = 8;
     hitbox.h = 8;
 
-    collisionPointsCount = 2;
-    collisionPoints = new SDL_Point[collisionPointsCount];
-    collisionPoints[0].x = facingRight ? 11 : 4;
-    collisionPoints[0].y = 0;
-    collisionPoints[1].x = facingRight ? 11 : 4;
-    collisionPoints[1].y = 7;
+    collisionPoint.x = facingRight ? 11 : 4;
+    collisionPoint.y = 7;
 
     exploding = false;
 }
@@ -52,8 +49,6 @@ Fireball::~Fireball() {
 
     delete movingAnimator;
     delete explodingAnimator;
-
-    delete[] collisionPoints;
 }
 
 GameObject::Type Fireball::getType() {
@@ -91,12 +86,11 @@ GameObject::CollisionResponse Fireball::receiveCollision(GameObject* sourceObjec
 void Fireball::update(SDL_Point *cameraPosition) {
     bool previouslyExploding = exploding;
     if (!exploding) {
+        applyVerticalMovement();
+    }
+    if (!exploding) {
         applyHorizontalMovement();
     }
-    // if (!exploding) {
-    //     applyVerticalMovement();
-    // }
-
     if (!exploding) {
         resolveCollisions();
     }
@@ -113,15 +107,28 @@ void Fireball::update(SDL_Point *cameraPosition) {
 
 void Fireball::applyHorizontalMovement() {
     position.x += velocity.x;
-    for (int i = 0; i < collisionPointsCount; i++) {
-        SDL_Point collisionPoint = collisionPoints[i];
-        SDL_Point testPoint = {
-            (int)position.x + collisionPoint.x,
-            (int)position.y + collisionPoint.y,
-        };
-        if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
-            exploding = true;
-        }
+    SDL_Point testPoint = {
+        (int)position.x + collisionPoint.x,
+        (int)position.y + collisionPoint.y,
+    };
+    if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+        exploding = true;
+    }
+}
+
+void Fireball::applyVerticalMovement() {
+    float previousPositionY = position.y;
+
+    velocity.y = SDL_min(velocity.y + GRAVITY, MAX_VERTICAL_VELOCITY);
+    position.y += velocity.y;
+
+    SDL_Point testPoint = {
+        (int)position.x + collisionPoint.x,
+        (int)position.y + collisionPoint.y,
+    };
+    if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+        position.y = previousPositionY;
+        velocity.y = -MAX_VERTICAL_VELOCITY;
     }
 }
 
