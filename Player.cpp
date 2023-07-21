@@ -467,7 +467,7 @@ void Player::attemptFireballThrow() {
     }
 
     SDL_FPoint fireballSpawnPosition = {
-        facingRight ? position.x + 8 : position.x,
+        facingRight ? position.x + 8 : position.x - 8,
         position.y + 8
     };
     objectsManager->add(new Fireball(fireballRenderer, currentLevel, &fireballSpawnPosition, objectsManager, facingRight));
