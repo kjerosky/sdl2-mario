@@ -8,7 +8,7 @@
 
 const float Goomba::HORIZONTAL_VELOCITY = -0.5f;
 const float Goomba::GRAVITY = 0.1f;
-const Uint64 Goomba::STOMPED_FRAMES = 60;
+const Uint64 Goomba::STOMPED_FRAMES = 30;
 
 Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position, GameObjectsManager* objectsManager) {
     this->position = *position;
@@ -49,7 +49,7 @@ Goomba::Goomba(SDL_Renderer* renderer, Level* currentLevel, SDL_FPoint* position
 
     int stompedFrames[] = {2};
     int stompedFramesCount = sizeof(stompedFrames) / sizeof(int);
-    stompedAnimator = new Animator(spriteSheet, 16, 16, 60, stompedFrames, stompedFramesCount);
+    stompedAnimator = new Animator(spriteSheet, 16, 16, STOMPED_FRAMES, stompedFrames, stompedFramesCount);
 
     int hitByFireballFrames[] = {0};
     int hitByFireballFramesCount = sizeof(hitByFireballFrames) / sizeof(int);
