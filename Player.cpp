@@ -166,6 +166,10 @@ SDL_Rect* Player::getHitBox() {
     return currentHitBox;
 }
 
+bool Player::isCollidable() {
+    return true;
+}
+
 bool Player::isStompable() {
     return true;
 }
@@ -341,7 +345,7 @@ void Player::applyVerticalMovement(float gravity) {
 
 void Player::resolveCollisions() {
     for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this) {
+        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
             continue;
         }
 

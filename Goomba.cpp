@@ -73,6 +73,10 @@ SDL_Rect* Goomba::getHitBox() {
     return &hitBox;
 }
 
+bool Goomba::isCollidable() {
+    return state == WALKING;
+}
+
 bool Goomba::isStompable() {
     return true;
 }
@@ -82,10 +86,6 @@ bool Goomba::isDrawnOnTop() {
 }
 
 GameObject::CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
-    if (state == STOMPED || state == DEAD) {
-        return NO_PROBLEM;
-    }
-
     GameObject::CollisionResponse response = NO_PROBLEM;
     GameObject::Type sourceType = sourceObject->getType();
     switch (sourceType) {
@@ -218,7 +218,7 @@ void Goomba::applyVerticalMovement() {
 
 void Goomba::resolveCollisions() {
     for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this) {
+        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
             continue;
         }
 

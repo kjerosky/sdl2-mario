@@ -20,6 +20,7 @@ public:
 
     GameObject::Type getType();
     SDL_Rect* getHitBox();
+    bool isCollidable();
     bool isStompable();
     bool isDrawnOnTop();
     GameObject::CollisionResponse receiveCollision(GameObject* sourceObject);

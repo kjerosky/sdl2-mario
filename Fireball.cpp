@@ -55,6 +55,10 @@ SDL_Rect* Fireball::getHitBox() {
     return &hitbox;
 }
 
+bool Fireball::isCollidable() {
+    return !exploding;
+}
+
 bool Fireball::isStompable() {
     return false;
 }
@@ -64,10 +68,6 @@ bool Fireball::isDrawnOnTop() {
 }
 
 GameObject::CollisionResponse Fireball::receiveCollision(GameObject* sourceObject) {
-    if (exploding) {
-        return NO_PROBLEM;
-    }
-
     GameObject::CollisionResponse response;
     switch (sourceObject->getType()) {
         case ENEMY: {
@@ -134,7 +134,7 @@ void Fireball::applyVerticalMovement() {
 
 void Fireball::resolveCollisions() {
     for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this) {
+        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
             continue;
         }
 
