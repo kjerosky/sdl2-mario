@@ -125,13 +125,17 @@ void Level::constrainCameraToLevel(SDL_Point *cameraPosition) {
 }
 
 bool Level::isWorldPositionInForegroundTile(SDL_Point *worldPosition) {
-    int tileX = worldPosition->x / tileHorizontalPixels;
-    int tileY = worldPosition->y / tileVerticalPixels;
-    int tileDataIndex = tileY * horizontalTileCount + tileX;
-    if (tileDataIndex >= tileDataCount) {
+    if (worldPosition->x < 0 || worldPosition->y < 0) {
         return false;
     }
 
+    int tileX = worldPosition->x / tileHorizontalPixels;
+    int tileY = worldPosition->y / tileVerticalPixels;
+    if (tileX >= horizontalTileCount || tileY >= verticalTileCount) {
+        return false;
+    }
+
+    int tileDataIndex = tileY * horizontalTileCount + tileX;
     int tileId = tileData[tileDataIndex];
     return foregroundTileIds.find(tileId) != foregroundTileIds.end();
 }

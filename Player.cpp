@@ -444,7 +444,21 @@ void Player::animateSprite() {
 
 void Player::centerCameraOnPlayer(SDL_Point* cameraPosition) {
     int renderWidth = GameConfig::getInstance()->getRenderWidth();
-    cameraPosition->x = position.x + 16 / 2 - renderWidth / 2;
+    int newCameraPositionX = position.x + 16 / 2 - renderWidth / 2;
+
+    // camera can only move right
+    if (newCameraPositionX > cameraPosition->x) {
+        cameraPosition->x = newCameraPositionX;
+    }
+
+    currentLevel->constrainCameraToLevel(cameraPosition);
+
+    // constrain player to camera's width
+    if (position.x < cameraPosition->x) {
+        position.x = cameraPosition->x;
+    } else if (position.x + SPRITE_WIDTH > cameraPosition->x + renderWidth) {
+        position.x = cameraPosition->x + renderWidth - SPRITE_WIDTH;
+    }
 }
 
 void Player::attemptFireballThrow() {
