@@ -185,7 +185,7 @@ bool Player::isStompable() {
 }
 
 bool Player::isDrawnOnTop() {
-    return false;
+    return true;
 }
 
 GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
@@ -233,6 +233,8 @@ void Player::checkStateTransitions() {
         case JUMPING:
             if (input->jumpWasReleased() || velocity.y > 0) {
                 state = FALLING;
+            } else if (isGrounded) {
+                state = ON_GROUND;
             }
             break;
         case FALLING:
