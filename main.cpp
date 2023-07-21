@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
 
         objects.destroyNonPlayerObjectsOutsideOfLevel(level);
+        objects.destroyNonPlayerObjectsBehindCamera(&worldCameraPosition);
         objects.cleanupDestroyedObjects();
 
         Time::waitUntilFrameEnd();

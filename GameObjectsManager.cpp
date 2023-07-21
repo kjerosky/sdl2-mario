@@ -1,5 +1,7 @@
 #include "GameObjectsManager.h"
 
+const int GameObjectsManager::BEHIND_CAMERA_OFFSET = 4 * 16;
+
 GameObjectsManager::GameObjectsManager() {
     // do nothing for now
 }
@@ -59,11 +61,29 @@ void GameObjectsManager::drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *c
 void GameObjectsManager::destroyNonPlayerObjectsOutsideOfLevel(Level* level) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         GameObject* theObject = *object;
+        if (theObject->getType() == GameObject::Type::PLAYER) {
+            continue;
+        }
+
         SDL_Point theObjectPosition = {
             (int)(theObject->getPosition()->x),
             (int)(theObject->getPosition()->y),
         };
-        if (theObject->getType() != GameObject::Type::PLAYER && level->isWorldPositionOutsideLevel(&theObjectPosition)) {
+        if (level->isWorldPositionOutsideLevel(&theObjectPosition)) {
+            objectsToDestroy.push_back(theObject);
+        }
+    }
+}
+
+void GameObjectsManager::destroyNonPlayerObjectsBehindCamera(SDL_Point *cameraPosition) {
+    for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
+        GameObject* theObject = *object;
+        if (theObject->getType() == GameObject::Type::PLAYER) {
+            continue;
+        }
+
+        int theObjectPositionX = (int)(theObject->getPosition()->x);
+        if (theObjectPositionX < cameraPosition->x - BEHIND_CAMERA_OFFSET) {
             objectsToDestroy.push_back(theObject);
         }
     }

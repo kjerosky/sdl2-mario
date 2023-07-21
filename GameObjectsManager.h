@@ -23,9 +23,12 @@ public:
     void drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
     void drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
     void destroyNonPlayerObjectsOutsideOfLevel(Level* level);
+    void destroyNonPlayerObjectsBehindCamera(SDL_Point *cameraPosition);
     void cleanupDestroyedObjects();
 
 private:
+
+    const static int BEHIND_CAMERA_OFFSET;
 
     std::vector<GameObject*> objects;
     std::vector<GameObject*> objectsToAdd;
