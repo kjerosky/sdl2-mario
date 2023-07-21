@@ -146,11 +146,6 @@ void Goomba::checkStateTransitions() {
             // nothing to do
             break;
     }
-
-    // account for pits and being hit by a fireball
-    if (position.y > GameConfig::getInstance()->getRenderHeight()) {
-        state = DEAD;
-    }
 }
 
 void Goomba::processCurrentState() {
@@ -301,8 +296,8 @@ void Goomba::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     }
 
     SDL_Point spritePosition = {
-        position.x - cameraPosition->x,
-        position.y - cameraPosition->y
+        (int)(position.x - cameraPosition->x),
+        (int)(position.y - cameraPosition->y),
     };
 
     if (state == HIT_BY_FIREBALL) {

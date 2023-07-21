@@ -521,8 +521,8 @@ void Player::powerDown() {
 
 void Player::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     SDL_Point spritePosition = {
-        position.x - cameraPosition->x,
-        position.y - cameraPosition->y
+        (int)(position.x - cameraPosition->x),
+        (int)(position.y - cameraPosition->y),
     };
 
     if (invincibilityFramesLeft <= 0 || invincibilityFramesLeft % 2 == 0) {

@@ -114,6 +114,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderCopy(renderer, renderTexture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
+        objects.destroyNonPlayerObjectsOutsideOfLevel(level);
         objects.cleanupDestroyedObjects();
 
         Time::waitUntilFrameEnd();

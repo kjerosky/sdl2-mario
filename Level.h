@@ -16,6 +16,7 @@ public:
     void renderBackgroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
     void renderForegroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
     bool isWorldPositionInForegroundTile(SDL_Point *worldPosition);
+    bool isWorldPositionOutsideLevel(SDL_Point *worldPosition);
 
 private:
 

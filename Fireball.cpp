@@ -177,8 +177,8 @@ void Fireball::beginExploding() {
 
 void Fireball::draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     SDL_Point spritePosition = {
-        position.x - cameraPosition->x,
-        position.y - cameraPosition->y
+        (int)(position.x - cameraPosition->x),
+        (int)(position.y - cameraPosition->y),
     };
 
     currentAnimator->draw(renderer, &spritePosition, !facingRight, false);

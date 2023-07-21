@@ -56,6 +56,19 @@ void GameObjectsManager::drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *c
     }
 }
 
+void GameObjectsManager::destroyNonPlayerObjectsOutsideOfLevel(Level* level) {
+    for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
+        GameObject* theObject = *object;
+        SDL_Point theObjectPosition = {
+            (int)(theObject->getPosition()->x),
+            (int)(theObject->getPosition()->y),
+        };
+        if (theObject->getType() != GameObject::Type::PLAYER && level->isWorldPositionOutsideLevel(&theObjectPosition)) {
+            objectsToDestroy.push_back(theObject);
+        }
+    }
+}
+
 void GameObjectsManager::cleanupDestroyedObjects() {
     for (std::vector<GameObject*>::iterator objectToDestroy = objectsToDestroy.begin(); objectToDestroy != objectsToDestroy.end(); objectToDestroy++) {
         std::vector<GameObject*>::iterator targetObject = std::find(objects.begin(), objects.end(), *objectToDestroy);

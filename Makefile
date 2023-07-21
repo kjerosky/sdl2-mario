@@ -23,7 +23,7 @@ LIBRARIES = \
 	-framework SDL2 \
 	-framework SDL2_image
 
-FLAGS = -Wall
+FLAGS = -Wall -std=c++11
 
 all:
 	g++ ${CPP_FILES} -o ${EXECUTABLE} ${FLAGS} ${INCLUDE_PATHS} ${LIBRARY_PATHS} ${LIBRARIES}

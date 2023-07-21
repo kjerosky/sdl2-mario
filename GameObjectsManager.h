@@ -1,9 +1,11 @@
 #ifndef GAME_OBJECTS_MANAGER_H
 #define GAME_OBJECTS_MANAGER_H
 
-#include "GameObject.h"
-#include "vector"
 #include <SDL.h>
+#include <vector>
+
+#include "GameObject.h"
+#include "Level.h"
 
 class GameObjectsManager {
 
@@ -20,6 +22,7 @@ public:
     void processPendingAdditions();
     void drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
     void drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
+    void destroyNonPlayerObjectsOutsideOfLevel(Level* level);
     void cleanupDestroyedObjects();
 
 private:
