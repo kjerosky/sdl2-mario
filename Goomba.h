@@ -19,6 +19,7 @@ public:
     GameObject::Type getType();
     SDL_Rect* getHitBox();
     bool isStompable();
+    bool isDrawnOnTop();
     GameObject::CollisionResponse receiveCollision(GameObject* sourceObject);
     void update(SDL_Point *cameraPosition);
     void draw(SDL_Renderer *renderer, SDL_Point *cameraPosition);

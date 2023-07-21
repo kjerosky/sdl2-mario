@@ -18,7 +18,8 @@ public:
 
     void updateAll(SDL_Point *cameraPosition);
     void processPendingAdditions();
-    void drawAll(SDL_Renderer *renderer, SDL_Point *cameraPosition);
+    void drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
+    void drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
     void cleanupDestroyedObjects();
 
 private:

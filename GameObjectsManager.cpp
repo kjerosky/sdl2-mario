@@ -38,9 +38,21 @@ void GameObjectsManager::processPendingAdditions() {
     }
 }
 
-void GameObjectsManager::drawAll(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
+void GameObjectsManager::drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
-        (*object)->draw(renderer, cameraPosition);
+        GameObject* theObject = *object;
+        if (!theObject->isDrawnOnTop()) {
+            theObject->draw(renderer, cameraPosition);
+        }
+    }
+}
+
+void GameObjectsManager::drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
+    for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
+        GameObject* theObject = *object;
+        if (theObject->isDrawnOnTop()) {
+            theObject->draw(renderer, cameraPosition);
+        }
     }
 }
 

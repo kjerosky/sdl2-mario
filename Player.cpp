@@ -184,6 +184,10 @@ bool Player::isStompable() {
     return true;
 }
 
+bool Player::isDrawnOnTop() {
+    return false;
+}
+
 GameObject::CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
     GameObject::CollisionResponse response;
     GameObject::Type sourceType = sourceObject->getType();

@@ -104,8 +104,9 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderTarget(renderer, renderTexture);
         level->clearWithBackgroundColor(renderer);
         level->renderBackgroundTiles(renderer, &worldCameraPosition);
-        objects.drawAll(renderer, &worldCameraPosition);
+        objects.drawObjects(renderer, &worldCameraPosition);
         level->renderForegroundTiles(renderer, &worldCameraPosition);
+        objects.drawTopmostObjects(renderer, &worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, NULL);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

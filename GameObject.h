@@ -32,6 +32,7 @@ public:
     virtual GameObject::Type getType() = 0;
     virtual SDL_Rect* getHitBox() = 0;
     virtual bool isStompable() = 0;
+    virtual bool isDrawnOnTop() = 0;
     virtual GameObject::CollisionResponse receiveCollision(GameObject* sourceObject) = 0;
     virtual void update(SDL_Point *cameraPosition) = 0;
     virtual void draw(SDL_Renderer *renderer, SDL_Point *cameraPosition) = 0;

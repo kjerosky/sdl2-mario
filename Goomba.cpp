@@ -82,6 +82,10 @@ bool Goomba::isStompable() {
     return true;
 }
 
+bool Goomba::isDrawnOnTop() {
+    return state == HIT_BY_FIREBALL;
+}
+
 GameObject::CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
     if (state == STOMPED || state == DEAD) {
         return NO_PROBLEM;

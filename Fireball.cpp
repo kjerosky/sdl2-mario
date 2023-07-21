@@ -63,6 +63,10 @@ bool Fireball::isStompable() {
     return false;
 }
 
+bool Fireball::isDrawnOnTop() {
+    return true;
+}
+
 GameObject::CollisionResponse Fireball::receiveCollision(GameObject* sourceObject) {
     if (exploding) {
         return NO_PROBLEM;
