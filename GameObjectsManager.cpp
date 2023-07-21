@@ -1,6 +1,9 @@
 #include "GameObjectsManager.h"
 
+#include "GameConfig.h"
+
 const int GameObjectsManager::BEHIND_CAMERA_OFFSET = 4 * 16;
+const int GameObjectsManager::NEAR_CAMERA_OFFSET = 2 * 16;
 
 GameObjectsManager::GameObjectsManager() {
     // do nothing for now
@@ -24,9 +27,26 @@ std::vector<GameObject*>* GameObjectsManager::getObjectList() {
     return &objects;
 }
 
+void GameObjectsManager::enableObjectsNearCamera(SDL_Point *cameraPosition) {
+    for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
+        GameObject* theObject = *object;
+        if (theObject->isEnabled()) {
+            continue;
+        }
+
+        int cameraWidth = GameConfig::getInstance()->getRenderWidth();
+        int theObjectPositionX = theObject->getPosition()->x;
+        if (theObjectPositionX < cameraPosition->x + cameraWidth + NEAR_CAMERA_OFFSET) {
+            theObject->enable();
+        }
+    }
+}
+
 void GameObjectsManager::updateAll(SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
-        (*object)->update(cameraPosition);
+        if ((*object)->isEnabled()) {
+            (*object)->update(cameraPosition);
+        }
     }
 }
 
@@ -43,7 +63,7 @@ void GameObjectsManager::processPendingAdditions() {
 void GameObjectsManager::drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         GameObject* theObject = *object;
-        if (!theObject->isDrawnOnTop()) {
+        if (theObject->isEnabled() && !theObject->isDrawnOnTop()) {
             theObject->draw(renderer, cameraPosition);
         }
     }
@@ -52,7 +72,7 @@ void GameObjectsManager::drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPo
 void GameObjectsManager::drawTopmostObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition) {
     for (std::vector<GameObject*>::iterator object = objects.begin(); object != objects.end(); object++) {
         GameObject* theObject = *object;
-        if (theObject->isDrawnOnTop()) {
+        if (theObject->isEnabled() && theObject->isDrawnOnTop()) {
             theObject->draw(renderer, cameraPosition);
         }
     }

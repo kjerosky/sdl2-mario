@@ -18,6 +18,7 @@ public:
     void destroy(GameObject *object);
     std::vector<GameObject*>* getObjectList();
 
+    void enableObjectsNearCamera(SDL_Point* cameraPosition);
     void updateAll(SDL_Point *cameraPosition);
     void processPendingAdditions();
     void drawObjects(SDL_Renderer *renderer, SDL_Point *cameraPosition);
@@ -29,6 +30,7 @@ public:
 private:
 
     const static int BEHIND_CAMERA_OFFSET;
+    const static int NEAR_CAMERA_OFFSET;
 
     std::vector<GameObject*> objects;
     std::vector<GameObject*> objectsToAdd;

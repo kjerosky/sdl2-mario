@@ -472,7 +472,11 @@ void Player::attemptFireballThrow() {
         facingRight ? position.x + 8 : position.x - 8,
         position.y + 8
     };
-    objectsManager->add(new Fireball(fireballRenderer, currentLevel, &fireballSpawnPosition, objectsManager, facingRight));
+
+    Fireball* fireball = new Fireball(fireballRenderer, currentLevel, &fireballSpawnPosition, objectsManager, facingRight);
+    fireball->enable();
+    objectsManager->add(fireball);
+
     throwFireballFramesLeft = THROW_FIREBALL_FRAME_COUNT;
 }
 

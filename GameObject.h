@@ -28,6 +28,8 @@ public:
 
     SDL_FPoint* getPosition() { return &position; }
     SDL_FPoint* getVelocity() { return &velocity; }
+    bool isEnabled() { return enabled; }
+    void enable() { enabled = true; }
 
     virtual GameObject::Type getType() = 0;
     virtual SDL_Rect* getHitBox() = 0;
@@ -41,6 +43,7 @@ protected:
 
     SDL_FPoint position;
     SDL_FPoint velocity;
+    bool enabled = false;
 };
 
 #endif

@@ -68,17 +68,23 @@ int main(int argc, char *argv[]) {
     Level *level = new Level(renderer, "assets/test-level-tiles.png");
     SDL_Point worldCameraPosition = {0, 0};
 
-    GameObjectsManager objects;
+    GameObjectsManager objectsManager;
+
     SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
-    objects.add(new Player(renderer, level, &initialPlayerPosition, &objects));
+    Player* player = new Player(renderer, level, &initialPlayerPosition, &objectsManager);
+    player->enable();
+    objectsManager.add(player);
 
     SDL_FPoint initialGoombaPosition = {10 * 16, 0 * 16};
-    objects.add(new Goomba(renderer, level, &initialGoombaPosition, &objects));
+    objectsManager.add(new Goomba(renderer, level, &initialGoombaPosition, &objectsManager));
 
     SDL_FPoint initialGoombaPosition2 = {9 * 16, 9 * 16};
-    objects.add(new Goomba(renderer, level, &initialGoombaPosition2, &objects));
+    objectsManager.add(new Goomba(renderer, level, &initialGoombaPosition2, &objectsManager));
     SDL_FPoint initialGoombaPosition3 = {10 * 16, 9 * 16};
-    objects.add(new Goomba(renderer, level, &initialGoombaPosition3, &objects));
+    objectsManager.add(new Goomba(renderer, level, &initialGoombaPosition3, &objectsManager));
+
+    SDL_FPoint initialOffscreenGoombaPosition = {27 * 16, 9 * 16};
+    objectsManager.add(new Goomba(renderer, level, &initialOffscreenGoombaPosition, &objectsManager));
 
     Time::initialize(60);
     Input* input = Input::getInstance();
@@ -96,17 +102,18 @@ int main(int argc, char *argv[]) {
 
         input->update();
 
-        objects.updateAll(&worldCameraPosition);
-        objects.processPendingAdditions();
+        objectsManager.enableObjectsNearCamera(&worldCameraPosition);
+        objectsManager.updateAll(&worldCameraPosition);
+        objectsManager.processPendingAdditions();
 
         level->constrainCameraToLevel(&worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, renderTexture);
         level->clearWithBackgroundColor(renderer);
         level->renderBackgroundTiles(renderer, &worldCameraPosition);
-        objects.drawObjects(renderer, &worldCameraPosition);
+        objectsManager.drawObjects(renderer, &worldCameraPosition);
         level->renderForegroundTiles(renderer, &worldCameraPosition);
-        objects.drawTopmostObjects(renderer, &worldCameraPosition);
+        objectsManager.drawTopmostObjects(renderer, &worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, NULL);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -114,9 +121,9 @@ int main(int argc, char *argv[]) {
         SDL_RenderCopy(renderer, renderTexture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
-        objects.destroyNonPlayerObjectsOutsideOfLevel(level);
-        objects.destroyNonPlayerObjectsBehindCamera(&worldCameraPosition);
-        objects.cleanupDestroyedObjects();
+        objectsManager.destroyNonPlayerObjectsOutsideOfLevel(level);
+        objectsManager.destroyNonPlayerObjectsBehindCamera(&worldCameraPosition);
+        objectsManager.cleanupDestroyedObjects();
 
         Time::waitUntilFrameEnd();
     }
