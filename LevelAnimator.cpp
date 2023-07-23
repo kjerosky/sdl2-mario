@@ -27,7 +27,11 @@ void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPositi
     blockBumpFramesLeft--;
     if (blockBumpFramesLeft == 0) {
         // manually draw the tile for one frame since level rendering runs before this method
-        levelTiles->drawSprite(renderer, postBlockBumpTileId, &blockPosition);
+        SDL_Point blockCameraPosition = {
+            blockPosition.x - worldCameraPosition->x,
+            blockPosition.y - worldCameraPosition->y,
+        };
+        levelTiles->drawSprite(renderer, postBlockBumpTileId, &blockCameraPosition);
         level->modifyTileData(blockBumpTileDataIndex, postBlockBumpTileId);
     } else {
 
@@ -93,14 +97,19 @@ void LevelAnimator::spawnBrickPieces(int worldPositionX, int worldPositionY) {
         worldPositionX,
         worldPositionY + BRICK_PIECE_OFFSET_Y
     };
-    objectsManager->add(new BrickPiece(&position, UP_LEFT));
+    BrickPiece* upperLeftBrickPiece = new BrickPiece(&position, UP_LEFT);
 
     position.x += BRICK_PIECE_SPACING;
-    objectsManager->add(new BrickPiece(&position, UP_RIGHT));
+    BrickPiece* upperRightBrickPiece = new BrickPiece(&position, UP_RIGHT);
 
     position.y += BRICK_PIECE_SPACING;
-    objectsManager->add(new BrickPiece(&position, DOWN_RIGHT));
+    BrickPiece* lowerRightBrickPiece = new BrickPiece(&position, DOWN_RIGHT);
 
     position.x -= BRICK_PIECE_SPACING;
-    objectsManager->add(new BrickPiece(&position, DOWN_LEFT));
+    BrickPiece* lowerLeftBrickPiece = new BrickPiece(&position, DOWN_LEFT);
+
+    objectsManager->add(upperLeftBrickPiece);
+    objectsManager->add(upperRightBrickPiece);
+    objectsManager->add(lowerRightBrickPiece);
+    objectsManager->add(lowerLeftBrickPiece);
 }
