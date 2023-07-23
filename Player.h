@@ -10,12 +10,13 @@
 #include "Input.h"
 #include "GameObjectsManager.h"
 #include "SpriteSheet.h"
+#include "LevelAnimator.h"
 
 class Player : public GameObject {
 
 public:
 
-    Player(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager);
+    Player(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManage, LevelAnimator* levelAnimator);
     ~Player();
 
     GameObjectType getType();
@@ -30,13 +31,15 @@ public:
 private:
 
     const static float JUMP_VELOCITY;
-    const static float BONK_VELOCITY;
+    const static float NORMAL_BONK_VELOCITY;
+    const static float SLOW_BONK_VELOCITY;
     const static float JUMP_GRAVITY;
     const static float FALL_GRAVITY;
     const static float STOMP_REACTION_VELOCITY;
     const static int SPRITE_WIDTH;
     const static int THROW_FIREBALL_FRAME_COUNT;
     const static int INVINCIBILITY_FRAMES_COUNT;
+    const static int BONK_POINT_X;
 
     enum PlayerState {
         ON_GROUND,
@@ -58,6 +61,8 @@ private:
     void updateGroundStatus();
     void applyHorizontalMovement();
     void applyVerticalMovement(float gravity);
+    void checkUpwardMovement();
+    void checkDownwardMovement();
     void resolveCollisions();
     void animateSprite();
     void centerCameraOnPlayer(SDL_Point* cameraPosition);
@@ -120,6 +125,8 @@ private:
     std::vector<GameObject*>* objectsList;
 
     int invincibilityFramesLeft;
+
+    LevelAnimator* levelAnimator;
 };
 
 #endif

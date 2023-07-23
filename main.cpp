@@ -10,6 +10,7 @@
 #include "Input.h"
 #include "Time.h"
 #include "SpriteSheetRepository.h"
+#include "LevelAnimator.h"
 
 int main(int argc, char *argv[]) {
 
@@ -77,24 +78,17 @@ int main(int argc, char *argv[]) {
     }
 
     Level *level = new Level();
-    SDL_Point worldCameraPosition = {0, 0};
-
+    LevelAnimator levelAnimator(level);
     GameObjectsManager objectsManager;
 
+    SDL_Point worldCameraPosition = {0, 0};
+
     SDL_FPoint initialPlayerPosition = {2 * 16, 9 * 16};
-    Player* player = new Player(level, &initialPlayerPosition, &objectsManager);
+    Player* player = new Player(level, &initialPlayerPosition, &objectsManager, &levelAnimator);
     objectsManager.add(player);
 
-    SDL_FPoint initialGoombaPosition = {10 * 16, 0 * 16};
+    SDL_FPoint initialGoombaPosition = {13 * 16, 9 * 16};
     objectsManager.add(new Goomba(level, &initialGoombaPosition, &objectsManager));
-
-    SDL_FPoint initialGoombaPosition2 = {9 * 16, 9 * 16};
-    objectsManager.add(new Goomba(level, &initialGoombaPosition2, &objectsManager));
-    SDL_FPoint initialGoombaPosition3 = {10 * 16, 9 * 16};
-    objectsManager.add(new Goomba(level, &initialGoombaPosition3, &objectsManager));
-
-    SDL_FPoint initialOffscreenGoombaPosition = {27 * 16, 9 * 16};
-    objectsManager.add(new Goomba(level, &initialOffscreenGoombaPosition, &objectsManager));
 
     Time::initialize(60);
     Input* input = Input::getInstance();
@@ -124,6 +118,7 @@ int main(int argc, char *argv[]) {
         objectsManager.drawObjects(renderer, &worldCameraPosition);
         level->renderForegroundTiles(renderer, &worldCameraPosition);
         objectsManager.drawTopmostObjects(renderer, &worldCameraPosition);
+        levelAnimator.animate(renderer, &worldCameraPosition);
 
         SDL_SetRenderTarget(renderer, NULL);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

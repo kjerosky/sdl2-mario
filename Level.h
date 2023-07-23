@@ -6,6 +6,15 @@
 
 #include "SpriteSheet.h"
 
+typedef struct TileInfo {
+    int worldPositionX;
+    int worldPositionY;
+    int tileDataIndex;
+    int tileId;
+    bool isBrick;
+    bool isQuestionBlock;
+} TileInfo;
+
 class Level {
 
 public:
@@ -19,6 +28,9 @@ public:
     void renderForegroundTiles(SDL_Renderer *renderer, SDL_Point *worldCameraPosition);
     bool isWorldPositionInForegroundTile(SDL_Point *worldPosition);
     bool isWorldPositionOutsideLevel(SDL_Point *worldPosition);
+    bool getTileData(SDL_Point* worldPosition, TileInfo* tileInfo);
+    void modifyTileData(int tileDataIndex, int tileId);
+    SpriteSheet* getLevelTiles();
 
 private:
 

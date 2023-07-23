@@ -74,3 +74,7 @@ void SpriteSheet::drawSprite(SDL_Renderer* renderer, int spriteIndex, SDL_Point 
         SDL_RenderCopyEx(renderer, texture, &sourceRectangle, &destinationRectangle, 0, NULL, flipping);
     }
 }
+
+int SpriteSheet::getSpriteCount() {
+    return rows * columns;
+}

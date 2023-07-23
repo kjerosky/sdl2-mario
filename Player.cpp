@@ -7,19 +7,22 @@
 #include "SpriteSheetRepository.h"
 
 const float Player::JUMP_VELOCITY = -3.7f;
-const float Player::BONK_VELOCITY = 3.0f;
+const float Player::NORMAL_BONK_VELOCITY = 3.0f;
+const float Player::SLOW_BONK_VELOCITY = 0.5f;
 const float Player::JUMP_GRAVITY = 0.1f;
 const float Player::FALL_GRAVITY = 0.3f;
 const float Player::STOMP_REACTION_VELOCITY = -3.0f;
 const int Player::SPRITE_WIDTH = 16;
 const int Player::THROW_FIREBALL_FRAME_COUNT = 7;
 const int Player::INVINCIBILITY_FRAMES_COUNT = 180;
+const int Player::BONK_POINT_X = 8;
 
-Player::Player(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager) {
+Player::Player(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* objectsManager, LevelAnimator* levelAnimator) {
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;
     objectsList = objectsManager->getObjectList();
+    this->levelAnimator = levelAnimator;
 
     enabled = true;
 
@@ -300,10 +303,9 @@ void Player::applyHorizontalMovement() {
             velocity.x = 0;
             position.x = (int)position.x;
 
-            testPoint.y = (int)position.y + collisionCheckPoint.y;
             do {
                 position.x += facingRight ? -1 : 1;
-                testPoint.x = (int)position.x + collisionCheckPoint.x;
+                testPoint.x += facingRight ? -1 : 1;
             } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
             break;
         }
@@ -318,24 +320,70 @@ void Player::applyVerticalMovement(float gravity) {
     velocity.y += gravity;
     position.y += velocity.y;
 
-    bool isMovingUpwards = velocity.y < 0;
+    if (velocity.y < 0) {
+        checkUpwardMovement();
+    } else {
+        checkDownwardMovement();
+    }
+}
+
+void Player::checkUpwardMovement() {
+    SDL_Point testPoint = {
+        (int)position.x + (facingRight ? BONK_POINT_X : (SPRITE_WIDTH - 1) - BONK_POINT_X),
+        (int)position.y,
+    };
+    if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+        velocity.y =
+            levelAnimator->animatePlayerBonk(&testPoint, powerState != SMALL_MARIO)
+            ? SLOW_BONK_VELOCITY
+            : NORMAL_BONK_VELOCITY;
+        position.y = (int)position.y;
+
+        do {
+            position.y++;
+            testPoint.y++;
+        } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
+        return;
+    }
+
     for (int i = 0; i < currentDownCollisionChecksCount; i++) {
         SDL_Point collisionCheckPoint = (*currentDownCollisionChecks)[i];
-        if (isMovingUpwards) {
-            collisionCheckPoint.y = (currentSpriteHeight - 1) - collisionCheckPoint.y;
-        }
+        collisionCheckPoint.y = (currentSpriteHeight - 1) - collisionCheckPoint.y;
 
         SDL_Point testPoint = {
             (int)position.x + collisionCheckPoint.x,
             (int)position.y + collisionCheckPoint.y,
         };
         if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
-            velocity.y = isMovingUpwards ? BONK_VELOCITY : 0;
+            velocity.y =
+                levelAnimator->animatePlayerBonk(&testPoint, powerState != SMALL_MARIO)
+                ? SLOW_BONK_VELOCITY
+                : NORMAL_BONK_VELOCITY;
+            position.y = (int)position.y;
+
+            do {
+                position.y++;
+                testPoint.y = (int)position.y + collisionCheckPoint.y;
+            } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
+            break;
+        }
+    }
+}
+
+void Player::checkDownwardMovement() {
+    for (int i = 0; i < currentDownCollisionChecksCount; i++) {
+        SDL_Point collisionCheckPoint = (*currentDownCollisionChecks)[i];
+        SDL_Point testPoint = {
+            (int)position.x + collisionCheckPoint.x,
+            (int)position.y + collisionCheckPoint.y,
+        };
+        if (currentLevel->isWorldPositionInForegroundTile(&testPoint)) {
+            velocity.y = 0;
             position.y = (int)position.y;
 
             testPoint.x = (int)position.x + collisionCheckPoint.x;
             do {
-                position.y += isMovingUpwards ? 1 : -1;
+                position.y--;
                 testPoint.y = (int)position.y + collisionCheckPoint.y;
             } while (currentLevel->isWorldPositionInForegroundTile(&testPoint));
             break;

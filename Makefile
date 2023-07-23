@@ -12,7 +12,9 @@ CPP_FILES = \
 	Goomba.cpp \
 	Fireball.cpp \
 	SpriteSheet.cpp \
-	SpriteSheetRepository.cpp
+	SpriteSheetRepository.cpp \
+	LevelAnimator.cpp \
+	TilesetConstants.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

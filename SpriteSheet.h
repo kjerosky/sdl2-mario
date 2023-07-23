@@ -13,6 +13,7 @@ public:
     bool wasLoadedSuccessfully();
     void drawSprite(SDL_Renderer* renderer, int spriteIndex, SDL_Point* position);
     void drawSprite(SDL_Renderer* renderer, int spriteIndex, SDL_Point* position, bool flipHorizontally, bool flipVertically);
+    int getSpriteCount();
 
 private:
 
