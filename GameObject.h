@@ -17,6 +17,8 @@ enum CollisionResponse {
     GET_STOMPED,
     REACT_TO_STOMP,
     TAKE_DAMAGE,
+    POWER_UP,
+    GET_CONSUMED,
 };
 
 class GameObject {

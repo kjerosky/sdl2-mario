@@ -194,6 +194,12 @@ CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
                 takeDamage();
             }
             break;
+
+        case POWERUP:
+            powerUp();
+            response = GET_CONSUMED;
+            break;
+
         default:
             response = NO_PROBLEM;
             break;
@@ -412,12 +418,19 @@ void Player::resolveCollisions() {
             case NO_PROBLEM:
                 // no need to react
                 break;
+
             case REACT_TO_STOMP:
                 velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
                 break;
+
             case TAKE_DAMAGE:
                 takeDamage();
                 break;
+
+            case POWER_UP:
+                powerUp();
+                break;
+
             default:
                 std::cerr << "[ERROR] Player received unknown collision response: " << collisionResponse << std::endl;
                 break;

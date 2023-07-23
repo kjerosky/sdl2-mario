@@ -21,6 +21,7 @@ bool SpriteSheetRepository::initialize(SDL_Renderer* renderer) {
     SpriteSheet* fireballSheet = new SpriteSheet("assets/fireball.png", 16, 16, renderer);
     SpriteSheet* goombaSheet = new SpriteSheet("assets/goomba.png", 16, 16, renderer);
     SpriteSheet* brickPiecesSheet = new SpriteSheet("assets/brick-pieces.png", 16, 16, renderer);
+    SpriteSheet* powerupsSheet = new SpriteSheet("assets/powerups.png", 16, 16, renderer);
 
     bool successfullyInitialized =
         testLevelTilesSheet->wasLoadedSuccessfully() &&
@@ -29,7 +30,8 @@ bool SpriteSheetRepository::initialize(SDL_Renderer* renderer) {
         fireMarioSheet->wasLoadedSuccessfully() &&
         fireballSheet->wasLoadedSuccessfully() &&
         goombaSheet->wasLoadedSuccessfully() &&
-        brickPiecesSheet->wasLoadedSuccessfully()
+        brickPiecesSheet->wasLoadedSuccessfully() &&
+        powerupsSheet->wasLoadedSuccessfully()
     ;
     if (!successfullyInitialized) {
         return false;
@@ -42,6 +44,7 @@ bool SpriteSheetRepository::initialize(SDL_Renderer* renderer) {
     idToSheetMap[FIREBALL_SHEET] = fireballSheet;
     idToSheetMap[GOOMBA_SHEET] = goombaSheet;
     idToSheetMap[BRICK_PIECES_SHEET] = brickPiecesSheet;
+    idToSheetMap[POWERUPS_SHEET] = powerupsSheet;
 
     return true;
 }

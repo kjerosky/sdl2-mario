@@ -24,6 +24,7 @@ private:
 
     void setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId);
     void spawnBrickPieces(int worldPositionX, int worldPositionY);
+    void spawnPowerup(int blockPositionX, int blockPositionY);
 
     Level* level;
     GameObjectsManager* objectsManager;

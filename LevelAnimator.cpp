@@ -1,6 +1,7 @@
 #include "LevelAnimator.h"
 #include "TilesetConstants.h"
 #include "BrickPiece.h"
+#include "MagicMushroom.h"
 
 // I got these from recording SMB1 gameplay and analyzing block movements lol
 const int LevelAnimator::BLOCK_BUMP_Y_OFFSETS[] = {
@@ -33,6 +34,9 @@ void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPositi
         };
         levelTiles->drawSprite(renderer, postBlockBumpTileId, &blockCameraPosition);
         level->modifyTileData(blockBumpTileDataIndex, postBlockBumpTileId);
+
+        //TODO DETERMINE IF A POWERUP SHOULD SPAWN
+        spawnPowerup(blockPosition.x, blockPosition.y);
     } else {
 
         SDL_Point offsetBlockPosition = {
@@ -112,4 +116,9 @@ void LevelAnimator::spawnBrickPieces(int worldPositionX, int worldPositionY) {
     objectsManager->add(upperRightBrickPiece);
     objectsManager->add(lowerRightBrickPiece);
     objectsManager->add(lowerLeftBrickPiece);
+}
+
+void LevelAnimator::spawnPowerup(int blockPositionX, int blockPositionY) {
+    SDL_FPoint powerupBlockPosition = {blockPositionX, blockPositionY};
+    objectsManager->add(new MagicMushroom(level, &powerupBlockPosition, objectsManager));
 }
