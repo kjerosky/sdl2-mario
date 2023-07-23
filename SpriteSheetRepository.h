@@ -12,6 +12,7 @@ enum SpriteSheetId {
     FIRE_MARIO_SHEET,
     GOOMBA_SHEET,
     FIREBALL_SHEET,
+    BRICK_PIECES_SHEET,
 };
 
 class SpriteSheetRepository {

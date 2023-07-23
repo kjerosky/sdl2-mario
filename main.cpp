@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
     }
 
     Level *level = new Level();
-    LevelAnimator levelAnimator(level);
     GameObjectsManager objectsManager;
+    LevelAnimator levelAnimator(level, &objectsManager);
 
     SDL_Point worldCameraPosition = {0, 0};
 

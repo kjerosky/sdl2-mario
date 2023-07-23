@@ -7,7 +7,8 @@ enum GameObjectType {
     PLAYER,
     ENEMY,
     FIREBALL,
-    POWERUP
+    POWERUP,
+    DECORATION,
 };
 
 enum CollisionResponse {
@@ -15,7 +16,7 @@ enum CollisionResponse {
     REVERSE_COURSE,
     GET_STOMPED,
     REACT_TO_STOMP,
-    TAKE_DAMAGE
+    TAKE_DAMAGE,
 };
 
 class GameObject {

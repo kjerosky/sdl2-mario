@@ -14,7 +14,8 @@ CPP_FILES = \
 	SpriteSheet.cpp \
 	SpriteSheetRepository.cpp \
 	LevelAnimator.cpp \
-	TilesetConstants.cpp
+	TilesetConstants.cpp \
+	BrickPiece.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

@@ -9,7 +9,7 @@ class Animator {
 
 public:
 
-    Animator(SpriteSheet* TESTspriteSheet, int framesPerAnimationFrame, int *frameIndices, int frameIndicesCount);
+    Animator(SpriteSheet* spriteSheet, int framesPerAnimationFrame, int *frameIndices, int frameIndicesCount);
     ~Animator();
 
     void reset();

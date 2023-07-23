@@ -1,14 +1,18 @@
 #include "LevelAnimator.h"
 #include "TilesetConstants.h"
+#include "BrickPiece.h"
 
 // I got these from recording SMB1 gameplay and analyzing block movements lol
 const int LevelAnimator::BLOCK_BUMP_Y_OFFSETS[] = {
     -1, -3, -5, -6, -6, -7, -7, -7, -6, -5, -4, -3, -1, 1
 };
 const int LevelAnimator::BLOCK_BUMP_FRAMES = sizeof(LevelAnimator::BLOCK_BUMP_Y_OFFSETS) / sizeof(int);
+const int LevelAnimator::BRICK_PIECE_SPACING = 8;
+const int LevelAnimator::BRICK_PIECE_OFFSET_Y = -4;
 
-LevelAnimator::LevelAnimator(Level* level) {
+LevelAnimator::LevelAnimator(Level* level, GameObjectsManager* objectsManager) {
     this->level = level;
+    this->objectsManager = objectsManager;
 
     blockBumpFramesLeft = 0;
 }
@@ -52,7 +56,7 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point *worldPoint, bool isPoweredUp) {
     } else if (tileInfo.isBrick) {
         if (isPoweredUp) {
             level->modifyTileData(tileInfo.tileDataIndex, TilesetConstants::TRANSPARENT_TILE_ID);
-            //TODO SPAWN BRICK PIECES HERE
+            spawnBrickPieces(tileInfo.worldPositionX, tileInfo.worldPositionY);
             wasSoftBonk = true;
         } else {
             setupBlockBumpAnimation(
@@ -82,4 +86,21 @@ void LevelAnimator::setupBlockBumpAnimation(int worldPositionX, int worldPositio
     SpriteSheet* levelTiles = level->getLevelTiles();
     int solidTransparentSpriteIndex = levelTiles->getSpriteCount() - 1;
     level->modifyTileData(tileDataIndex, solidTransparentSpriteIndex);
+}
+
+void LevelAnimator::spawnBrickPieces(int worldPositionX, int worldPositionY) {
+    SDL_Point position = {
+        worldPositionX,
+        worldPositionY + BRICK_PIECE_OFFSET_Y
+    };
+    objectsManager->add(new BrickPiece(&position, UP_LEFT));
+
+    position.x += BRICK_PIECE_SPACING;
+    objectsManager->add(new BrickPiece(&position, UP_RIGHT));
+
+    position.y += BRICK_PIECE_SPACING;
+    objectsManager->add(new BrickPiece(&position, DOWN_RIGHT));
+
+    position.x -= BRICK_PIECE_SPACING;
+    objectsManager->add(new BrickPiece(&position, DOWN_LEFT));
 }
