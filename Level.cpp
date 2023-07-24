@@ -46,6 +46,9 @@ Level::Level() {
     // mainly used for animating the player bumping a block from below.
     foregroundTileIds.insert(levelTiles->getSpriteCount() - 1);
 
+    powerupLocations.insert(std::pair<int, int>(6, 3));
+    powerupLocations.insert(std::pair<int, int>(2, 4));
+
     backgroundColor.r = 49;
     backgroundColor.g = 171;
     backgroundColor.b = 232;
@@ -127,13 +130,13 @@ bool Level::isWorldPositionInForegroundTile(SDL_Point *worldPosition) {
         return false;
     }
 
-    int tileX = worldPosition->x / tileHorizontalPixels;
-    int tileY = worldPosition->y / tileVerticalPixels;
-    if (tileX >= horizontalTileCount || tileY >= verticalTileCount) {
+    int tileColumn = worldPosition->x / tileHorizontalPixels;
+    int tileRow = worldPosition->y / tileVerticalPixels;
+    if (tileColumn >= horizontalTileCount || tileRow >= verticalTileCount) {
         return false;
     }
 
-    int tileDataIndex = tileY * horizontalTileCount + tileX;
+    int tileDataIndex = tileRow * horizontalTileCount + tileColumn;
     int tileId = tileData[tileDataIndex];
     return foregroundTileIds.find(tileId) != foregroundTileIds.end();
 }
@@ -150,18 +153,19 @@ bool Level::getTileData(SDL_Point *worldPosition, TileInfo* tileInfo) {
         return false;
     }
 
-    int tileX = worldPosition->x / tileHorizontalPixels;
-    int tileY = worldPosition->y / tileVerticalPixels;
-    if (tileX >= horizontalTileCount || tileY >= verticalTileCount) {
+    int tileColumn = worldPosition->x / tileHorizontalPixels;
+    int tileRow = worldPosition->y / tileVerticalPixels;
+    if (tileColumn >= horizontalTileCount || tileRow >= verticalTileCount) {
         return false;
     }
 
-    int tileWorldPositionX = tileX * tileHorizontalPixels;
-    int tileWorldPositionY = tileY * tileVerticalPixels;
-    int tileDataIndex = tileY * horizontalTileCount + tileX;
+    int tileWorldPositionX = tileColumn * tileHorizontalPixels;
+    int tileWorldPositionY = tileRow * tileVerticalPixels;
+    int tileDataIndex = tileRow * horizontalTileCount + tileColumn;
     int tileId = tileData[tileDataIndex];
     bool isBrick = tileId == TilesetConstants::BRICK_TILE_ID;
     bool isQuestionBlock = tileId == TilesetConstants::QUESTION_BLOCK_TILE_ID;
+    bool containsPowerup = powerupLocations.find(std::pair<int, int>(tileRow, tileColumn)) != powerupLocations.end();
 
     tileInfo->worldPositionX = tileWorldPositionX;
     tileInfo->worldPositionY = tileWorldPositionY;
@@ -169,6 +173,7 @@ bool Level::getTileData(SDL_Point *worldPosition, TileInfo* tileInfo) {
     tileInfo->tileId = tileId;
     tileInfo->isBrick = isBrick;
     tileInfo->isQuestionBlock = isQuestionBlock;
+    tileInfo->containsPowerup = containsPowerup;
     return true;
 }
 

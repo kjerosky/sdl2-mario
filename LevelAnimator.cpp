@@ -17,8 +17,6 @@ LevelAnimator::LevelAnimator(Level* level, GameObjectsManager* objectsManager) {
     this->objectsManager = objectsManager;
 
     blockBumpFramesLeft = 0;
-
-    playerIsPoweredUp = false;
 }
 
 void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPosition) {
@@ -38,8 +36,9 @@ void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPositi
         levelTiles->drawSprite(renderer, postBlockBumpTileId, &blockCameraPosition);
         level->modifyTileData(blockBumpTileDataIndex, postBlockBumpTileId);
 
-        //TODO DETERMINE IF A POWERUP SHOULD SPAWN
-        spawnPowerup(blockPosition.x, blockPosition.y);
+        if (bumpedBlockContainsPowerup) {
+            spawnPowerup(blockPosition.x, blockPosition.y);
+        }
     } else {
 
         SDL_Point offsetBlockPosition = {
@@ -64,7 +63,8 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
             tileInfo.worldPositionX,
             tileInfo.worldPositionY,
             tileInfo.tileDataIndex,
-            TilesetConstants::HIT_QUESTION_BLOCK_TILE_ID
+            TilesetConstants::HIT_QUESTION_BLOCK_TILE_ID,
+            tileInfo.containsPowerup
         );
     } else if (tileInfo.isBrick) {
         if (isPoweredUp) {
@@ -76,7 +76,8 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
                 tileInfo.worldPositionX,
                 tileInfo.worldPositionY,
                 tileInfo.tileDataIndex,
-                tileInfo.tileId
+                tileInfo.tileId,
+                tileInfo.containsPowerup
             );
         }
     }
@@ -84,8 +85,8 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
     return wasSoftBonk;
 }
 
-void LevelAnimator::setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId) {
-    // flush current bonk animation
+void LevelAnimator::setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId, bool blockContainsPowerup) {
+    // ignore block bump is another is being animated
     if (blockBumpFramesLeft > 0) {
         level->modifyTileData(blockBumpTileDataIndex, postBlockBumpTileId);
     }
@@ -95,6 +96,7 @@ void LevelAnimator::setupBlockBumpAnimation(int worldPositionX, int worldPositio
     blockBumpTileDataIndex = tileDataIndex;
     postBlockBumpTileId = postAnimationTileId;
     blockBumpFramesLeft = BLOCK_BUMP_FRAMES + 1;
+    bumpedBlockContainsPowerup = blockContainsPowerup;
 
     SpriteSheet* levelTiles = level->getLevelTiles();
     int solidTransparentSpriteIndex = levelTiles->getSpriteCount() - 1;

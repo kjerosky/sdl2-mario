@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <set>
+#include <utility>
 
 #include "SpriteSheet.h"
 
@@ -13,6 +14,7 @@ typedef struct TileInfo {
     int tileId;
     bool isBrick;
     bool isQuestionBlock;
+    bool containsPowerup;
 } TileInfo;
 
 class Level {
@@ -45,6 +47,7 @@ private:
     SDL_Color backgroundColor;
     std::set<int> foregroundTileIds;
     std::set<int> backgroundTileIds;
+    std::set<std::pair<int, int> > powerupLocations;
 
     void render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition, std::set<int> *renderForeground);
 };

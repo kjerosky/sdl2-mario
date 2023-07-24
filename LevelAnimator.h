@@ -22,7 +22,7 @@ private:
     const static int BRICK_PIECE_SPACING;
     const static int BRICK_PIECE_OFFSET_Y;
 
-    void setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId);
+    void setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId, bool blockContainsPowerup);
     void spawnBrickPieces(int worldPositionX, int worldPositionY);
     void spawnPowerup(int blockPositionX, int blockPositionY);
 
@@ -33,6 +33,7 @@ private:
     int postBlockBumpTileId;
     int blockBumpFramesLeft;
     SDL_Point blockPosition;
+    bool bumpedBlockContainsPowerup;
 
     bool playerIsPoweredUp;
 };
