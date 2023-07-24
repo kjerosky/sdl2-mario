@@ -17,9 +17,13 @@ LevelAnimator::LevelAnimator(Level* level, GameObjectsManager* objectsManager) {
     this->objectsManager = objectsManager;
 
     blockBumpFramesLeft = 0;
+    frameCount = 0;
 }
 
 void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPosition) {
+    animateQuestionBlocks();
+    frameCount++;
+
     if (blockBumpFramesLeft <= 0) {
         return;
     }
@@ -129,5 +133,19 @@ void LevelAnimator::spawnPowerup(int blockPositionX, int blockPositionY) {
         objectsManager->add(new FireFlower(level, &powerupBlockPosition, objectsManager));
     } else {
         objectsManager->add(new MagicMushroom(level, &powerupBlockPosition, objectsManager));
+    }
+}
+
+void LevelAnimator::animateQuestionBlocks() {
+    // animation frame counts: 24 (tile 1), 9 (tile 2), 7 (tile 3), 9 (tile 2), ...
+    int frame = frameCount % 49;
+    if (frame < 24) {
+        level->animateTileId(TilesetConstants::QUESTION_BLOCK_TILE_ID, TilesetConstants::QUESTION_BLOCK_TILE_ID);
+    } else if (frame >= 24 && frame < 33) {
+        level->animateTileId(TilesetConstants::QUESTION_BLOCK_TILE_ID, TilesetConstants::QUESTION_BLOCK_2_TILE_ID);
+    } else if (frame >= 33 && frame < 40) {
+        level->animateTileId(TilesetConstants::QUESTION_BLOCK_TILE_ID, TilesetConstants::QUESTION_BLOCK_3_TILE_ID);
+    } else {
+        level->animateTileId(TilesetConstants::QUESTION_BLOCK_TILE_ID, TilesetConstants::QUESTION_BLOCK_2_TILE_ID);
     }
 }

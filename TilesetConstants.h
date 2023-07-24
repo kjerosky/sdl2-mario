@@ -7,6 +7,8 @@ public:
 
     const static int BRICK_TILE_ID;
     const static int QUESTION_BLOCK_TILE_ID;
+    const static int QUESTION_BLOCK_2_TILE_ID;
+    const static int QUESTION_BLOCK_3_TILE_ID;
     const static int TRANSPARENT_TILE_ID;
     const static int HIT_QUESTION_BLOCK_TILE_ID;
 };

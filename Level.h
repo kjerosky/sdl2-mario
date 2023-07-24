@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <set>
 #include <utility>
+#include <map>
 
 #include "SpriteSheet.h"
 
@@ -33,6 +34,7 @@ public:
     bool getTileData(SDL_Point* worldPosition, TileInfo* tileInfo);
     void modifyTileData(int tileDataIndex, int tileId);
     SpriteSheet* getLevelTiles();
+    void animateTileId(int tileId, int animatedTileId);
 
 private:
 
@@ -48,6 +50,7 @@ private:
     std::set<int> foregroundTileIds;
     std::set<int> backgroundTileIds;
     std::set<std::pair<int, int> > powerupLocations;
+    std::map<int, int> tileIdToAnimatedTileIdMap;
 
     void render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition, std::set<int> *renderForeground);
 };

@@ -104,6 +104,10 @@ void Level::render(SDL_Renderer *renderer, SDL_Point *worldCameraPosition, std::
                 continue;
             }
 
+            if (tileIdToAnimatedTileIdMap.find(tileId) != tileIdToAnimatedTileIdMap.end()) {
+                tileId = tileIdToAnimatedTileIdMap[tileId];
+            }
+
             SDL_Point position = {
                 x * tileHorizontalPixels - worldCameraPosition->x,
                 y * tileVerticalPixels - worldCameraPosition->y,
@@ -184,4 +188,8 @@ void Level::modifyTileData(int tileDataIndex, int tileId) {
 
 SpriteSheet* Level::getLevelTiles() {
     return levelTiles;
+}
+
+void Level::animateTileId(int tileId, int animatedTileId) {
+    tileIdToAnimatedTileIdMap[tileId] = animatedTileId;
 }

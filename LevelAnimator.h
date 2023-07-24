@@ -25,6 +25,7 @@ private:
     void setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId, bool blockContainsPowerup);
     void spawnBrickPieces(int worldPositionX, int worldPositionY);
     void spawnPowerup(int blockPositionX, int blockPositionY);
+    void animateQuestionBlocks();
 
     Level* level;
     GameObjectsManager* objectsManager;
@@ -36,6 +37,8 @@ private:
     bool bumpedBlockContainsPowerup;
 
     bool playerIsPoweredUp;
+
+    int frameCount;
 };
 
 #endif
