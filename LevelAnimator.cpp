@@ -2,6 +2,7 @@
 #include "TilesetConstants.h"
 #include "BrickPiece.h"
 #include "MagicMushroom.h"
+#include "FireFlower.h"
 
 // I got these from recording SMB1 gameplay and analyzing block movements lol
 const int LevelAnimator::BLOCK_BUMP_Y_OFFSETS[] = {
@@ -120,5 +121,5 @@ void LevelAnimator::spawnBrickPieces(int worldPositionX, int worldPositionY) {
 
 void LevelAnimator::spawnPowerup(int blockPositionX, int blockPositionY) {
     SDL_FPoint powerupBlockPosition = {blockPositionX, blockPositionY};
-    objectsManager->add(new MagicMushroom(level, &powerupBlockPosition, objectsManager));
+    objectsManager->add(new FireFlower(level, &powerupBlockPosition, objectsManager));
 }
