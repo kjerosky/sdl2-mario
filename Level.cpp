@@ -46,6 +46,7 @@ Level::Level() {
     // mainly used for animating the player bumping a block from below.
     foregroundTileIds.insert(levelTiles->getSpriteCount() - 1);
 
+    powerupLocations.insert(std::pair<int, int>(6, 2));
     powerupLocations.insert(std::pair<int, int>(6, 3));
     powerupLocations.insert(std::pair<int, int>(2, 4));
 

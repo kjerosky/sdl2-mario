@@ -13,7 +13,7 @@ public:
     LevelAnimator(Level* level, GameObjectsManager* objectsManager);
 
     void animate(SDL_Renderer* renderer, SDL_Point* worldCameraPosition);
-    bool animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp);
+    bool animatePlayerBonk(SDL_Point* worldPoint, bool playerIsPoweredUp);
 
 private:
 

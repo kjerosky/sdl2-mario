@@ -49,8 +49,8 @@ void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPositi
     }
 }
 
-bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
-    playerIsPoweredUp = isPoweredUp;
+bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool playerIsPoweredUp) {
+    this->playerIsPoweredUp = playerIsPoweredUp;
 
     TileInfo tileInfo;
     if (!level->getTileData(worldPoint, &tileInfo)) {
@@ -58,7 +58,7 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
     }
 
     bool wasSoftBonk = false;
-    if (tileInfo.isQuestionBlock) {
+    if (tileInfo.isQuestionBlock || (tileInfo.isBrick && tileInfo.containsPowerup)) {
         setupBlockBumpAnimation(
             tileInfo.worldPositionX,
             tileInfo.worldPositionY,
@@ -66,20 +66,18 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
             TilesetConstants::HIT_QUESTION_BLOCK_TILE_ID,
             tileInfo.containsPowerup
         );
+    } else if (tileInfo.isBrick && playerIsPoweredUp) {
+        level->modifyTileData(tileInfo.tileDataIndex, TilesetConstants::TRANSPARENT_TILE_ID);
+        spawnBrickPieces(tileInfo.worldPositionX, tileInfo.worldPositionY);
+        wasSoftBonk = true;
     } else if (tileInfo.isBrick) {
-        if (isPoweredUp) {
-            level->modifyTileData(tileInfo.tileDataIndex, TilesetConstants::TRANSPARENT_TILE_ID);
-            spawnBrickPieces(tileInfo.worldPositionX, tileInfo.worldPositionY);
-            wasSoftBonk = true;
-        } else {
-            setupBlockBumpAnimation(
-                tileInfo.worldPositionX,
-                tileInfo.worldPositionY,
-                tileInfo.tileDataIndex,
-                tileInfo.tileId,
-                tileInfo.containsPowerup
-            );
-        }
+        setupBlockBumpAnimation(
+            tileInfo.worldPositionX,
+            tileInfo.worldPositionY,
+            tileInfo.tileDataIndex,
+            tileInfo.tileId,
+            tileInfo.containsPowerup
+        );
     }
 
     return wasSoftBonk;
