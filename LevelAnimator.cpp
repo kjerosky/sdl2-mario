@@ -17,6 +17,8 @@ LevelAnimator::LevelAnimator(Level* level, GameObjectsManager* objectsManager) {
     this->objectsManager = objectsManager;
 
     blockBumpFramesLeft = 0;
+
+    playerIsPoweredUp = false;
 }
 
 void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPosition) {
@@ -48,7 +50,9 @@ void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPositi
     }
 }
 
-bool LevelAnimator::animatePlayerBonk(SDL_Point *worldPoint, bool isPoweredUp) {
+bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool isPoweredUp) {
+    playerIsPoweredUp = isPoweredUp;
+
     TileInfo tileInfo;
     if (!level->getTileData(worldPoint, &tileInfo)) {
         return false;
@@ -121,5 +125,9 @@ void LevelAnimator::spawnBrickPieces(int worldPositionX, int worldPositionY) {
 
 void LevelAnimator::spawnPowerup(int blockPositionX, int blockPositionY) {
     SDL_FPoint powerupBlockPosition = {blockPositionX, blockPositionY};
-    objectsManager->add(new FireFlower(level, &powerupBlockPosition, objectsManager));
+    if (playerIsPoweredUp) {
+        objectsManager->add(new FireFlower(level, &powerupBlockPosition, objectsManager));
+    } else {
+        objectsManager->add(new MagicMushroom(level, &powerupBlockPosition, objectsManager));
+    }
 }

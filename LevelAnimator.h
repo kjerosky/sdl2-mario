@@ -33,6 +33,8 @@ private:
     int postBlockBumpTileId;
     int blockBumpFramesLeft;
     SDL_Point blockPosition;
+
+    bool playerIsPoweredUp;
 };
 
 #endif
