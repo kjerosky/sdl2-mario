@@ -18,7 +18,8 @@ CPP_FILES = \
 	BrickPiece.cpp \
 	MagicMushroom.cpp \
 	FireFlower.cpp \
-	CollisionSystem.cpp
+	CollisionSystem.cpp \
+	BlockBumpKillZone.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

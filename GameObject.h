@@ -11,6 +11,7 @@ enum GameObjectType {
     FIREBALL,
     POWERUP,
     DECORATION,
+    BLOCK_BUMP,
 };
 
 class GameObject {

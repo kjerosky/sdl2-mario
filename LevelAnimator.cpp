@@ -11,10 +11,14 @@ const int LevelAnimator::BLOCK_BUMP_Y_OFFSETS[] = {
 const int LevelAnimator::BLOCK_BUMP_FRAMES = sizeof(LevelAnimator::BLOCK_BUMP_Y_OFFSETS) / sizeof(int);
 const int LevelAnimator::BRICK_PIECE_SPACING = 8;
 const int LevelAnimator::BRICK_PIECE_OFFSET_Y = -4;
+const int LevelAnimator::DAMAGING_BUMP_FRAME_INDEX = 6;
+const int LevelAnimator::BLOCK_SPACING = 16;
 
 LevelAnimator::LevelAnimator(Level* level, GameObjectsManager* objectsManager) {
     this->level = level;
     this->objectsManager = objectsManager;
+
+    collisionSystem = CollisionSystem::getInstance();
 
     blockBumpFramesLeft = 0;
     frameCount = 0;
@@ -44,12 +48,16 @@ void LevelAnimator::animate(SDL_Renderer* renderer, SDL_Point* worldCameraPositi
             spawnPowerup(blockPosition.x, blockPosition.y);
         }
     } else {
-
+        int blockBumpFrameIndex = BLOCK_BUMP_FRAMES - blockBumpFramesLeft;
         SDL_Point offsetBlockPosition = {
             blockPosition.x - worldCameraPosition->x,
-            blockPosition.y - worldCameraPosition->y + BLOCK_BUMP_Y_OFFSETS[BLOCK_BUMP_FRAMES - blockBumpFramesLeft],
+            blockPosition.y - worldCameraPosition->y + BLOCK_BUMP_Y_OFFSETS[blockBumpFrameIndex],
         };
         levelTiles->drawSprite(renderer, postBlockBumpTileId, &offsetBlockPosition);
+
+        if (blockBumpFrameIndex == DAMAGING_BUMP_FRAME_INDEX) {
+            bumpEnemyAboveBlock();
+        }
     }
 }
 
@@ -71,6 +79,10 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool playerIsPowere
             tileInfo.containsPowerup
         );
     } else if (tileInfo.isBrick && playerIsPoweredUp) {
+        blockPosition.x = tileInfo.worldPositionX;
+        blockPosition.y = tileInfo.worldPositionY;
+        bumpEnemyAboveBlock();
+
         level->modifyTileData(tileInfo.tileDataIndex, TilesetConstants::TRANSPARENT_TILE_ID);
         spawnBrickPieces(tileInfo.worldPositionX, tileInfo.worldPositionY);
         wasSoftBonk = true;
@@ -88,7 +100,7 @@ bool LevelAnimator::animatePlayerBonk(SDL_Point* worldPoint, bool playerIsPowere
 }
 
 void LevelAnimator::setupBlockBumpAnimation(int worldPositionX, int worldPositionY, int tileDataIndex, int postAnimationTileId, bool blockContainsPowerup) {
-    // ignore block bump is another is being animated
+    // ignore block bump if another is being animated
     if (blockBumpFramesLeft > 0) {
         level->modifyTileData(blockBumpTileDataIndex, postBlockBumpTileId);
     }
@@ -148,4 +160,13 @@ void LevelAnimator::animateQuestionBlocks() {
     } else {
         level->animateTileId(TilesetConstants::QUESTION_BLOCK_TILE_ID, TilesetConstants::QUESTION_BLOCK_2_TILE_ID);
     }
+}
+
+void LevelAnimator::bumpEnemyAboveBlock() {
+    SDL_Point killZonePosition = {
+        blockPosition.x,
+        blockPosition.y - BLOCK_SPACING,
+    };
+    blockBumpKillZone.setPosition(&killZonePosition);
+    collisionSystem->testObjectAgainstAllOthers(&blockBumpKillZone);
 }

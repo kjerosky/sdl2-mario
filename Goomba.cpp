@@ -112,6 +112,11 @@ CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
             response.type = TAKE_DAMAGE;
         } break;
 
+        case BLOCK_BUMP: {
+            takeDamage(velocity.x >= 0);
+            response.type = NO_PROBLEM;
+        } break;
+
         default: {
             response.type = NO_PROBLEM;
         } break;
