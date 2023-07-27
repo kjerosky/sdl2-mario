@@ -52,10 +52,10 @@ bool FireFlower::isDrawnOnTop() {
 }
 
 CollisionResponse FireFlower::receiveCollision(GameObject* sourceObject) {
-    CollisionResponse response = NO_PROBLEM;
+    CollisionResponse response = {NO_PROBLEM, this};
     if (sourceObject->getType() == PLAYER) {
         getConsumedByPlayer();
-        response = POWER_UP;
+        response.type = POWER_UP;
     }
 
     return response;

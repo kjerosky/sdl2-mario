@@ -16,7 +16,8 @@ Goomba::Goomba(Level* currentLevel, SDL_FPoint* position, GameObjectsManager* ob
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;
-    this->objectsList = objectsManager->getObjectList();
+
+    collisionSystem = CollisionSystem::getInstance();
 
     velocity.x = HORIZONTAL_VELOCITY;
     velocity.y = 0;
@@ -88,31 +89,31 @@ bool Goomba::isDrawnOnTop() {
 }
 
 CollisionResponse Goomba::receiveCollision(GameObject* sourceObject) {
-    CollisionResponse response = NO_PROBLEM;
+    CollisionResponse response = {NO_PROBLEM, this};
     GameObjectType sourceType = sourceObject->getType();
     switch (sourceType) {
         case PLAYER: {
             bool isPlayerFalling = sourceObject->getVelocity()->y > 0;
             if (isPlayerFalling) {
-                response = REACT_TO_STOMP;
+                response.type = REACT_TO_STOMP;
                 state = STOMPED;
             } else {
-                response = TAKE_DAMAGE;
+                response.type = TAKE_DAMAGE;
             }
         } break;
 
         case ENEMY: {
             velocity.x = -velocity.x;
-            response = REVERSE_COURSE;
+            response.type = REVERSE_COURSE;
         } break;
 
         case FIREBALL: {
             takeDamage(sourceObject->getVelocity()->x >= 0);
-            response = TAKE_DAMAGE;
+            response.type = TAKE_DAMAGE;
         } break;
 
         default: {
-            response = NO_PROBLEM;
+            response.type = NO_PROBLEM;
         } break;
     }
 
@@ -219,39 +220,30 @@ void Goomba::applyVerticalMovement() {
 }
 
 void Goomba::resolveCollisions() {
-    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
-            continue;
-        }
+    bool shouldReverseCourse = false;
+    bool shouldGetStomped = false;
+    bool shouldTakeDamage = false;
+    bool fallRightFromDamage = false;
 
-        SDL_Rect myWorldHitBox = *getHitBox();
-        myWorldHitBox.x += position.x;
-        myWorldHitBox.y += position.y;
-        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
-        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
-        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
-        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
-            continue;
+    std::vector<CollisionResponse>* collisionResponses = collisionSystem->testObjectAgainstAllOthers(this);
+    for (std::vector<CollisionResponse>::iterator responseIterator = collisionResponses->begin(); responseIterator != collisionResponses->end(); responseIterator++) {
+        CollisionResponse response = *responseIterator;
+        if (response.type == REVERSE_COURSE) {
+            shouldReverseCourse = true;
+        } else if (response.type == GET_STOMPED) {
+            shouldGetStomped = true;
+        } else if (response.type == TAKE_DAMAGE) {
+            shouldTakeDamage = true;
+            fallRightFromDamage = response.source->getVelocity()->x >= 0;
         }
+    }
 
-        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
-        switch (collisionResponse) {
-            case NO_PROBLEM:
-                // no need to react
-                break;
-            case REVERSE_COURSE:
-                velocity.x = -velocity.x;
-                break;
-            case GET_STOMPED:
-                state = STOMPED;
-                break;
-            case TAKE_DAMAGE:
-                takeDamage((*currentObject)->getVelocity()->x >= 0);
-                break;
-            default:
-                std::cerr << "[ERROR] Goomba received unknown collision response: " << collisionResponse << std::endl;
-                break;
-        }
+    if (shouldTakeDamage) {
+        takeDamage(fallRightFromDamage);
+    } else if (shouldGetStomped) {
+        state = STOMPED;
+    } else if (shouldReverseCourse) {
+        velocity.x = -velocity.x;
     }
 }
 

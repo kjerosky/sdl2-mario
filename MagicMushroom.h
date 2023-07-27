@@ -10,6 +10,7 @@
 #include "SpriteSheet.h"
 #include "Animator.h"
 #include "GameObjectsManager.h"
+#include "CollisionSystem.h"
 
 class MagicMushroom : public GameObject {
 
@@ -65,7 +66,7 @@ private:
     int leavingBlockTargetY;
 
     GameObjectsManager* objectsManager;
-    std::vector<GameObject*>* objectsList;
+    CollisionSystem* collisionSystem;
 };
 
 #endif

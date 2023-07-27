@@ -17,7 +17,8 @@ CPP_FILES = \
 	TilesetConstants.cpp \
 	BrickPiece.cpp \
 	MagicMushroom.cpp \
-	FireFlower.cpp
+	FireFlower.cpp \
+	CollisionSystem.cpp
 
 INCLUDE_PATHS = \
 	-I/Library/Frameworks/SDL2.framework/Headers \

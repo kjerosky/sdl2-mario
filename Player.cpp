@@ -21,8 +21,9 @@ Player::Player(Level *currentLevel, SDL_FPoint *position, GameObjectsManager* ob
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;
-    objectsList = objectsManager->getObjectList();
     this->levelAnimator = levelAnimator;
+
+    collisionSystem = CollisionSystem::getInstance();
 
     enabled = true;
 
@@ -182,26 +183,26 @@ bool Player::isDrawnOnTop() {
 }
 
 CollisionResponse Player::receiveCollision(GameObject* sourceObject) {
-    CollisionResponse response;
+    CollisionResponse response = {NO_PROBLEM, this};
     GameObjectType sourceType = sourceObject->getType();
     switch (sourceType) {
         case ENEMY:
             if (sourceObject->isStompable() && velocity.y > 0) {
-                velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
-                response = GET_STOMPED;
+                velocity.y = STOMP_REACTION_VELOCITY;
+                response.type = GET_STOMPED;
             } else {
-                response = NO_PROBLEM;
+                response.type = NO_PROBLEM;
                 takeDamage();
             }
             break;
 
         case POWERUP:
             powerUp();
-            response = GET_CONSUMED;
+            response.type = GET_CONSUMED;
             break;
 
         default:
-            response = NO_PROBLEM;
+            response.type = NO_PROBLEM;
             break;
     }
 
@@ -398,45 +399,33 @@ void Player::checkDownwardMovement() {
 }
 
 void Player::resolveCollisions() {
-    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
-            continue;
-        }
+    bool shouldReactToStomp = false;
+    bool shouldTakeDamage = false;
+    bool shouldPowerUp = false;
 
-        SDL_Rect myWorldHitBox = *getHitBox();
-        myWorldHitBox.x += position.x;
-        myWorldHitBox.y += position.y;
-        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
-        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
-        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
-        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
-            continue;
-        }
-
-        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
-        switch (collisionResponse) {
-            case NO_PROBLEM:
-                // no need to react
-                break;
-
-            case REACT_TO_STOMP:
-                velocity.y = STOMP_REACTION_VELOCITY; // fake bounce velocity
-                break;
-
-            case TAKE_DAMAGE:
-                takeDamage();
-                break;
-
-            case POWER_UP:
-                powerUp();
-                break;
-
-            default:
-                std::cerr << "[ERROR] Player received unknown collision response: " << collisionResponse << std::endl;
-                break;
+    std::vector<CollisionResponse>* collisionResponses = collisionSystem->testObjectAgainstAllOthers(this);
+    for (std::vector<CollisionResponse>::iterator responseIterator = collisionResponses->begin(); responseIterator != collisionResponses->end(); responseIterator++) {
+        CollisionResponse response = *responseIterator;
+        if (response.type == REACT_TO_STOMP) {
+            shouldReactToStomp = true;
+        } else if (response.type == TAKE_DAMAGE) {
+            shouldTakeDamage = true;
+        } else if (response.type == POWER_UP) {
+            shouldPowerUp = true;
         }
     }
 
+    if (shouldReactToStomp) {
+        velocity.y = STOMP_REACTION_VELOCITY;
+    }
+    if (shouldPowerUp) {
+        powerUp();
+    }
+    if (shouldTakeDamage) {
+        takeDamage();
+    }
+
+    //TODO REMOVE THIS EVENTUALLY
     if (powerState != FIRE_MARIO && input->DEBUG_plus_buttonWasPressed()) {
         powerUp();
     } else if (powerState != SMALL_MARIO && input->DEBUG_minus_buttonWasPressed()) {

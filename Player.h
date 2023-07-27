@@ -11,6 +11,7 @@
 #include "GameObjectsManager.h"
 #include "SpriteSheet.h"
 #include "LevelAnimator.h"
+#include "CollisionSystem.h"
 
 class Player : public GameObject {
 
@@ -122,7 +123,7 @@ private:
     Level *currentLevel;
 
     GameObjectsManager* objectsManager;
-    std::vector<GameObject*>* objectsList;
+    CollisionSystem* collisionSystem;
 
     int invincibilityFramesLeft;
 

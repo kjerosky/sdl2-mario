@@ -9,6 +9,7 @@
 #include "Animator.h"
 #include "GameObjectsManager.h"
 #include "SpriteSheet.h"
+#include "CollisionSystem.h"
 
 class Goomba : public GameObject {
 
@@ -69,7 +70,7 @@ private:
     Level* currentLevel;
 
     GameObjectsManager* objectsManager;
-    std::vector<GameObject*>* objectsList;
+    CollisionSystem* collisionSystem;
 };
 
 #endif

@@ -12,7 +12,8 @@ const float MagicMushroom::LEAVING_BLOCK_VELOCITY_Y = -0.25f;
 MagicMushroom::MagicMushroom(Level* level, SDL_FPoint* blockPosition, GameObjectsManager* objectsManager) {
     this->level = level;
     this->objectsManager = objectsManager;
-    objectsList = objectsManager->getObjectList();
+
+    collisionSystem = CollisionSystem::getInstance();
 
     position.x = blockPosition->x;
     position.y = blockPosition->y + SPAWN_OFFSET_Y;
@@ -76,10 +77,10 @@ bool MagicMushroom::isDrawnOnTop() {
 }
 
 CollisionResponse MagicMushroom::receiveCollision(GameObject* sourceObject) {
-    CollisionResponse response = NO_PROBLEM;
+    CollisionResponse response = {NO_PROBLEM, this};
     if (sourceObject->getType() == PLAYER) {
         getConsumedByPlayer();
-        response = POWER_UP;
+        response.type = POWER_UP;
     }
 
     return response;
@@ -159,23 +160,9 @@ void MagicMushroom::applyVerticalMovement() {
 }
 
 void MagicMushroom::resolveCollisions() {
-    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
-            continue;
-        }
-
-        SDL_Rect myWorldHitBox = *getHitBox();
-        myWorldHitBox.x += position.x;
-        myWorldHitBox.y += position.y;
-        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
-        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
-        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
-        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
-            continue;
-        }
-
-        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
-        if (collisionResponse == GET_CONSUMED) {
+    std::vector<CollisionResponse>* collisionResponses = collisionSystem->testObjectAgainstAllOthers(this);
+    for (std::vector<CollisionResponse>::iterator responseIterator = collisionResponses->begin(); responseIterator != collisionResponses->end(); responseIterator++) {
+        if ((*responseIterator).type == GET_CONSUMED) {
             getConsumedByPlayer();
             break;
         }

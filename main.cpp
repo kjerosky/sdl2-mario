@@ -11,6 +11,7 @@
 #include "Time.h"
 #include "SpriteSheetRepository.h"
 #include "LevelAnimator.h"
+#include "CollisionSystem.h"
 
 int main(int argc, char *argv[]) {
 
@@ -80,6 +81,9 @@ int main(int argc, char *argv[]) {
     Level *level = new Level();
     GameObjectsManager objectsManager;
     LevelAnimator levelAnimator(level, &objectsManager);
+
+    CollisionSystem* collisionSystem = CollisionSystem::getInstance();
+    collisionSystem->initialize(objectsManager.getObjectList());
 
     SDL_Point worldCameraPosition = {0, 0};
 

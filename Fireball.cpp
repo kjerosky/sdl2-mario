@@ -13,8 +13,9 @@ Fireball::Fireball(Level *currentLevel, SDL_FPoint *position, GameObjectsManager
     this->position = *position;
     this->currentLevel = currentLevel;
     this->objectsManager = objectsManager;
-    objectsList = objectsManager->getObjectList();
     this->facingRight = facingRight;
+
+    collisionSystem = CollisionSystem::getInstance();
 
     velocity.x = facingRight ? HORIZONTAL_VELOCITY : -HORIZONTAL_VELOCITY;
     velocity.y = MAX_VERTICAL_VELOCITY;
@@ -68,15 +69,15 @@ bool Fireball::isDrawnOnTop() {
 }
 
 CollisionResponse Fireball::receiveCollision(GameObject* sourceObject) {
-    CollisionResponse response;
+    CollisionResponse response = {NO_PROBLEM, this};
     switch (sourceObject->getType()) {
         case ENEMY: {
             beginExploding();
-            response = TAKE_DAMAGE;
+            response.type = TAKE_DAMAGE;
         } break;
 
         default: {
-            response = NO_PROBLEM;
+            response.type = NO_PROBLEM;
         }
     }
 
@@ -133,34 +134,10 @@ void Fireball::applyVerticalMovement() {
 }
 
 void Fireball::resolveCollisions() {
-    for (std::vector<GameObject*>::iterator currentObject = objectsList->begin(); currentObject != objectsList->end(); currentObject++) {
-        if (*currentObject == this || !(*currentObject)->isEnabled() || !(*currentObject)->isCollidable()) {
-            continue;
-        }
-
-        SDL_Rect myWorldHitBox = *getHitBox();
-        myWorldHitBox.x += position.x;
-        myWorldHitBox.y += position.y;
-        SDL_Rect otherWorldHitBox = *((*currentObject)->getHitBox());
-        otherWorldHitBox.x += (*currentObject)->getPosition()->x;
-        otherWorldHitBox.y += (*currentObject)->getPosition()->y;
-        if (!SDL_HasIntersection(&myWorldHitBox, &otherWorldHitBox)) {
-            continue;
-        }
-
-        CollisionResponse collisionResponse = (*currentObject)->receiveCollision(this);
-        switch (collisionResponse) {
-            case NO_PROBLEM:
-                // no need to react
-                break;
-
-            case TAKE_DAMAGE:
-                beginExploding();
-                break;
-
-            default:
-                std::cerr << "[ERROR] Fireball received unknown collision response: " << collisionResponse << std::endl;
-                break;
+    std::vector<CollisionResponse>* collisionResponses = collisionSystem->testObjectAgainstAllOthers(this);
+    for (std::vector<CollisionResponse>::iterator responseIterator = collisionResponses->begin(); responseIterator != collisionResponses->end(); responseIterator++) {
+        if ((*responseIterator).type == TAKE_DAMAGE) {
+            beginExploding();
         }
     }
 }

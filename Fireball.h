@@ -9,6 +9,7 @@
 #include "GameObjectsManager.h"
 #include "Animator.h"
 #include "SpriteSheet.h"
+#include "CollisionSystem.h"
 
 class Fireball : public GameObject {
 
@@ -40,7 +41,6 @@ private:
 
     Level* currentLevel;
     GameObjectsManager* objectsManager;
-    std::vector<GameObject*>* objectsList;
     bool facingRight;
 
     SpriteSheet* spriteSheet;
@@ -52,6 +52,8 @@ private:
     SDL_Point collisionPoint;
 
     bool exploding;
+
+    CollisionSystem* collisionSystem;
 };
 
 #endif

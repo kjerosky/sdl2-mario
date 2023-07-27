@@ -52,7 +52,8 @@ bool BrickPiece::isDrawnOnTop() {
 }
 
 CollisionResponse BrickPiece::receiveCollision(GameObject *sourceObject) {
-    return NO_PROBLEM;
+    CollisionResponse response = {NO_PROBLEM, this};
+    return response;
 }
 
 void BrickPiece::update(SDL_Point *cameraPosition) {

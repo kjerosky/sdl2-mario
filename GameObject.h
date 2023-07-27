@@ -3,22 +3,14 @@
 
 #include <SDL.h>
 
+#include "CollisionSystem.h"
+
 enum GameObjectType {
     PLAYER,
     ENEMY,
     FIREBALL,
     POWERUP,
     DECORATION,
-};
-
-enum CollisionResponse {
-    NO_PROBLEM,
-    REVERSE_COURSE,
-    GET_STOMPED,
-    REACT_TO_STOMP,
-    TAKE_DAMAGE,
-    POWER_UP,
-    GET_CONSUMED,
 };
 
 class GameObject {
